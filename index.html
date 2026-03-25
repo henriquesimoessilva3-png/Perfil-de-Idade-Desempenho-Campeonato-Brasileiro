@@ -1276,166 +1276,140 @@ function renderScatters(allTeams) {
 
 
 // ─── RENDER TEAM YEAR GRID ────────────────────────────────────────────────────
-const DISPLAY_YEARS = new Set([2023,2024,2025]);
+const DISPLAY_YEARS = new Set([2025]);
 let _lastTeams = null;
 
 function renderTeamYearGrid(allTeams) {
   _lastTeams = allTeams;
-  const group = 'AMBOS'; // Always locked to G5 + Z4
 
-  // User-controlled years (from chips), 2026 is always appended as pinned
-  const userYears = [...DISPLAY_YEARS].filter(y => y !== 2026).sort();
-  const dispYears = [...userYears, 2026]; // 2026 ALWAYS last, regardless of chips
+  // Single selected year
+  const selYear = [...DISPLAY_YEARS][0] || 2025;
 
-  // All G5/Z4 teams for the user-selected years (not 2026 — no other club has data)
-  let allG5Z4teams = allTeams.filter(t =>
-    userYears.includes(t.ano) && t.pos > 0 && t.total > 0 &&
-    (group === 'AMBOS' ? ['G5','Z4'].includes(t.g5z4) : t.g5z4 === group)
-  );
+  // G5 and Z4 teams for the selected year (Botafogo rendered separately below)
+  const g5Teams = allTeams.filter(t =>
+    t.ano === selYear && t.pos > 0 && t.total > 0 && t.g5z4 === 'G5' && t.nome !== 'Botafogo'
+  ).sort((a,b) => a.pos - b.pos);
 
-  // BOTAFOGO pinned reference: fetch all user-selected years + always 2026
-  let botoAllYears = allTeams.filter(t =>
-    dispYears.includes(t.ano) && t.total > 0 && t.nome === 'Botafogo'
-  );
-  // Always inject BOTO_2026 — never conditional
-  if (!botoAllYears.find(t => t.ano === 2026)) {
-    botoAllYears = [...botoAllYears, BOTO_2026];
-  }
-  const botoInGroup = allG5Z4teams.filter(t => t.nome === 'Botafogo');
+  const z4Teams = allTeams.filter(t =>
+    t.ano === selYear && t.pos > 0 && t.total > 0 && t.g5z4 === 'Z4' && t.nome !== 'Botafogo'
+  ).sort((a,b) => a.pos - b.pos);
 
-  const teamNames = [...new Set(allG5Z4teams.map(t => t.nome))].sort((a,b) => {
-    const ga = allG5Z4teams.find(t=>t.nome===a)?.g5z4 || '';
-    const gb = allG5Z4teams.find(t=>t.nome===b)?.g5z4 || '';
-    if (group==='AMBOS' && ga !== gb) return ga==='G5' ? -1 : 1;
-    const latest = dispYears[dispYears.length-1];
-    const pa = allG5Z4teams.find(t=>t.nome===a&&t.ano===latest)?.pos||99;
-    const pb = allG5Z4teams.find(t=>t.nome===b&&t.ano===latest)?.pos||99;
-    return pa - pb;
-  });
+  // Botafogo for selected year
+  const botoYear = allTeams.find(t => t.ano === selYear && t.nome === 'Botafogo' && t.total > 0) || null;
 
-  if (!teamNames.length && !botoAllYears.length) {
-    document.getElementById('teamYearGrid').innerHTML = '<p style="font-size:12px;color:var(--txt2);padding:12px">'+t('tyg_nodata')+'</p>';
-    return;
-  }
-
-  function pct(t, f) { return t && t.total ? +((t[f]/t.total)*100).toFixed(0) : null; }
-  function pillIdeal(v, faixa) {
-    if (v===null) return '';
-    const [lo,hi] = IDEAL[faixa];
-    if (v>=lo&&v<=hi) return 'tp-ok';
-    return Math.abs(v-(lo+hi)/2)<10 ? 'tp-warn' : 'tp-bad';
-  }
   const pColor = {'Até 20':'tp20','21 a 25':'tp21','26 a 29':'tp26','30+':'tp30'};
 
-  function miniStack(t) {
-    if (!t||!t.total) return '<span style="color:#ccc;font-size:10px">—</span>';
-    return FAIXAS.map(f=>{
-      const v = pct(t,f)||0;
-      return `<div class="mini-seg" style="width:${v}%;background:${FC[f]}" title="${f}: ${v}%">${v>=14?v+'%':''}</div>`;
+  function pct(rec, f) {
+    return rec && rec.total ? +((rec[f] / rec.total) * 100).toFixed(0) : null;
+  }
+  function pillIdeal(v, faixa) {
+    if (v === null) return '';
+    const [lo,hi] = IDEAL[faixa];
+    if (v >= lo && v <= hi) return 'tp-ok';
+    return Math.abs(v - (lo+hi)/2) < 10 ? 'tp-warn' : 'tp-bad';
+  }
+  function miniStack(rec) {
+    if (!rec || !rec.total) return '<span style="color:#ccc;font-size:10px">—</span>';
+    return FAIXAS.map(f => {
+      const v = pct(rec, f) || 0;
+      return `<div class="mini-seg" style="width:${v}%;background:${FC[f]}" title="${tFaixa(f)}: ${v}%">${v >= 14 ? v+'%' : ''}</div>`;
     }).join('');
   }
 
-  function cell(v, f) {
-    if (v===null) return '<td style="color:#CCC">—</td>';
-    return `<td><span class="tp ${pColor[f]} ${pillIdeal(v,f)}">${v}%</span></td>`;
-  }
-
-  function buildRow(nome, teamsPool, isRef) {
-    const tG5z4 = teamsPool.find(t=>t.nome===nome)?.g5z4||'Outros';
-    let rowBg = isRef ? '' : '';
-    let tdClass = isRef ? 'team-name' : `team-name ${tG5z4==='G5'?'g5-t':'z4-t'}`;
-    let refStyle = isRef
-      ? 'background:linear-gradient(90deg,#FFF8E1,#FFFDE7);border-left:4px solid #F59E0B !important;'
+  // ── Build a standard data row ──────────────────────────────────────────────
+  function buildDataRow(rec, rowStyle, nameStyle, nameBadge, nameExtra) {
+    const sc = balanceScore({
+      'Até 20':pct(rec,'Até 20')||0,'21 a 25':pct(rec,'21 a 25')||0,
+      '26 a 29':pct(rec,'26 a 29')||0,'30+':pct(rec,'30+')||0
+    });
+    const scColor = sc>=75?'#22C55E':sc>=55?'#F59E0B':'#EF4444';
+    const posCls  = rec.g5z4==='G5'?'pos-g5':rec.g5z4==='Z4'?'pos-z4':'';
+    const posDisplay = rec._ongoing
+      ? `<span style="padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800;background:#FEF3C7;color:#92400E;border:1px solid #F59E0B">${currentLang==='en'?'Live':'Em curso'}</span>`
+      : `<span class="pos-badge ${posCls}">${rec.pos}º</span>`;
+    const posExtra = rec._ongoing
+      ? `<br><span style="font-size:8px;color:#92400E;font-weight:600">${rec.total} ${currentLang==='en'?'pl':'jog'}/300min</span>`
       : '';
-    let nameCell = isRef
-      ? `<td class="${tdClass}" style="${refStyle}">
-          <span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px;margin-right:4px">📌 REF</span>
-          ${nome}
-         </td>`
-      : `<td class="${tdClass}">${nome}</td>`;
 
-    let row = nameCell;
-    dispYears.forEach(y => {
-      const teamRec = teamsPool.find(tt=>tt.nome===nome&&tt.ano===y);
-      // Non-Botafogo teams have no data for 2026
-      if (y === 2026 && nome !== 'Botafogo') {
-        row += `<td colspan="6" style="background:linear-gradient(90deg,#FFF8E1,#FFFDE7);color:#B45309;font-size:9px;font-style:italic;text-align:center;border-left:2px solid #F59E0B">
-          <span style="font-weight:700">—</span><br><span style="font-size:8px;opacity:.7">${currentLang==='en'?'no data 2026':'sem dados 2026'}</span>
-        </td>`;
-        return;
-      }
-      if (!teamRec) {
-        row += `<td colspan="6" style="color:#CCC;font-size:10px;font-style:italic;text-align:center;background:#FAFAFA">${t('tyg_nopart')}</td>`;
-        return;
-      }
-      const t2 = teamRec;
-      const posCls = t2.g5z4==='G5'?'pos-g5':'pos-z4';
-      const sc = balanceScore({'Até 20':pct(t2,'Até 20')||0,'21 a 25':pct(t2,'21 a 25')||0,'26 a 29':pct(t2,'26 a 29')||0,'30+':pct(t2,'30+')||0});
-      const scColor = sc>=75?'#22C55E':sc>=55?'#F59E0B':'#EF4444';
-      const cellBg = isRef ? 'background:#FFFBEA;' : y===2026 ? 'background:#FFFBEA;' : '';
-      const posDisplay = t2._ongoing
-        ? `<span style="padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800;background:#FEF3C7;color:#92400E;border:1px solid #F59E0B">${currentLang==='en'?'Live':'Em curso'}</span>`
-        : `<span class="pos-badge ${posCls}">${t2.pos}º</span>`;
-      const totalNote = t2._ongoing ? `<br><span style="font-size:8px;color:#92400E;font-weight:600">${t2.total} ${currentLang==='en'?'pl':'jog'}/300min</span>` : '';
-      row += `<td style="${cellBg}">${posDisplay}<br><span style="font-size:9px;font-weight:700;color:${scColor}">sc:${sc}</span>${totalNote}</td>`;
-      FAIXAS.forEach(f => {
-        const v = pct(t2,f);
-        if (v===null) { row += `<td style="${cellBg}color:#CCC">—</td>`; return; }
-        row += `<td style="${cellBg}"><span class="tp ${pColor[f]} ${pillIdeal(v,f)}">${v}%</span></td>`;
-      });
-      row += `<td style="min-width:120px;padding:3px 6px;${cellBg}"><div class="mini-stack">${miniStack(t2)}</div></td>`;
+    let row = `<td class="team-name" style="${nameStyle}">`;
+    if (nameBadge) row += nameBadge;
+    row += rec.nome;
+    if (nameExtra) row += nameExtra;
+    row += `</td>`;
+    row += `<td style="${rowStyle}">${posDisplay}<br><span style="font-size:9px;font-weight:700;color:${scColor}">sc:${sc}</span>${posExtra}</td>`;
+    FAIXAS.forEach(f => {
+      const v = pct(rec, f);
+      if (v === null) { row += `<td style="${rowStyle}color:#CCC">—</td>`; return; }
+      row += `<td style="${rowStyle}"><span class="tp ${pColor[f]} ${pillIdeal(v,f)}">${v}%</span></td>`;
     });
-    return `<tr${isRef?' class="boto-ref-row"':''}>${row}</tr>`;
+    row += `<td style="min-width:120px;padding:3px 6px;${rowStyle}"><div class="mini-stack">${miniStack(rec)}</div></td>`;
+    return row;
   }
 
-  const YR_BG = {2021:'#0F2D6A',2022:'#15367A',2023:'#1C408A',2024:'#1F3864',2025:'#162E58'};
-  const LIVE_BG = 'linear-gradient(135deg,#92400E 0%,#B45309 100%)';
+  // ── Section divider row ────────────────────────────────────────────────────
+  function sectionDiv(bg, fg, border, label) {
+    return `<tr><td colspan="7" style="background:${bg};color:${fg};font-weight:800;font-size:11px;padding:6px 12px;border-bottom:2px solid ${border};border-top:2px solid ${border}">${label}</td></tr>`;
+  }
+
+  // ── Table header ──────────────────────────────────────────────────────────
   let html = `<div class="tyg-outer"><table class="tyg-table"><thead>`;
-  html += `<tr><th class="team-col" rowspan="2">${t('th_team')}</th>`;
-  dispYears.forEach(y => {
-    if (y === 2026) {
-      html += `<th class="year-hdr" colspan="6" style="background:${LIVE_BG}">
-        2026 &nbsp;<span style="background:#F59E0B;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:8px;vertical-align:middle">${currentLang==='en'?'LIVE':'EM CURSO'}</span>
-        &nbsp;<span style="font-size:8px;font-weight:500;opacity:.75">${currentLang==='en'?'300 min · Botafogo only':'300 min · só Botafogo'}</span>
-      </th>`;
-    } else {
-      html += `<th class="year-hdr" colspan="6" style="background:${YR_BG[y]||'#1F3864'}">${y}</th>`;
-    }
-  });
-  html += '</tr><tr>';
-  dispYears.forEach(y => {
-    const subBg = y === 2026 ? 'background:#78350F;color:#FDE68A' : 'background:#2E2E2E;color:#fff';
-    [t('tyg_pos'),t('tyg_u20'),t('tyg_21'),t('tyg_26'),t('tyg_30'),t('tyg_bar')].forEach(h => {
-      html += `<th class="faixa-hdr" style="${subBg}">${h}</th>`;
-    });
-  });
-  html += '</tr></thead><tbody>';
+  html += `<tr>
+    <th class="team-col" style="background:#1A1A2E;color:#fff;text-align:left;min-width:160px">${t('th_team')} – ${selYear}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_pos')}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_u20')}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_21')}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_26')}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_30')}</th>
+    <th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${t('tyg_bar')}</th>
+  </tr></thead><tbody>`;
 
-  // ── BOTAFOGO PINNED ROW (always first, amber header) ──────────────────────
-  if (botoAllYears.length) {
-    const liveLabel = currentLang==='en'
-      ? `<span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px;margin-left:8px">2026 LIVE · 300 min · always shown</span>`
-      : `<span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px;margin-left:8px">2026 EM CURSO · 300 min · sempre exibido</span>`;
-    html += `<tr><td colspan="${1+dispYears.length*6}"
-      style="background:linear-gradient(90deg,#FEF3C7,#FFF8DC);color:#92400E;font-weight:800;font-size:11px;padding:5px 12px;border-bottom:2px solid #F59E0B;border-top:2px solid #F59E0B">
-      📌 Botafogo – ${currentLang==='en'?'Fixed Reference (always shown)':'Referência Fixa (sempre exibida)'}${liveLabel}
-    </td></tr>`;
-    html += buildRow('Botafogo', botoAllYears, true);
-    html += `<tr><td colspan="${1+dispYears.length*6}" style="height:3px;background:linear-gradient(90deg,#F59E0B,transparent)"></td></tr>`;
+  // ── G5 section ────────────────────────────────────────────────────────────
+  if (g5Teams.length) {
+    html += sectionDiv('#D6E4F7','#1F3864','#1F3864',`🔵 G5 – ${t('lbl_g5')}`);
+    g5Teams.forEach(rec => {
+      html += `<tr class="g5-row">${buildDataRow(rec,'','team-name g5-t','','')}</tr>`;
+    });
   }
 
-  // ── MAIN GROUP ROWS ───────────────────────────────────────────────────────
-  let lastG = null;
-  teamNames.forEach(nome => {
-    if (nome === 'Botafogo') return; // skip - already shown as pinned ref
-    const tG5z4 = allG5Z4teams.find(t=>t.nome===nome)?.g5z4||'';
-    if (group==='AMBOS' && tG5z4 !== lastG) {
-      lastG = tG5z4;
-      const bg=tG5z4==='G5'?'#D6E4F7':'#FAD5D5', fg=tG5z4==='G5'?'#1F3864':'#7B0000';
-      html += `<tr><td colspan="${1+dispYears.length*6}" style="background:${bg};color:${fg};font-weight:800;font-size:11px;padding:6px 12px;border-bottom:2px solid ${fg}">${tG5z4==='G5'?('🔵 G5 – '+t('lbl_g5')):('🔴 Z4 – '+t('tyg_z4zone'))}</td></tr>`;
-    }
-    html += buildRow(nome, allG5Z4teams, false);
-  });
+  // ── Z4 section ────────────────────────────────────────────────────────────
+  if (z4Teams.length) {
+    html += sectionDiv('#FAD5D5','#7B0000','#7B0000',`🔴 Z4 – ${t('tyg_z4zone')}`);
+    z4Teams.forEach(rec => {
+      html += `<tr class="z4-row">${buildDataRow(rec,'','team-name z4-t','','')}</tr>`;
+    });
+  }
+
+  // ── Botafogo selected year (orange section) ───────────────────────────────
+  html += `<tr><td colspan="7" style="background:linear-gradient(90deg,#FEF3C7,#FFF8DC);color:#92400E;font-weight:800;font-size:11px;padding:6px 12px;border-top:2px solid #F59E0B;border-bottom:2px solid #F59E0B">
+    📌 Botafogo – ${selYear}
+    <span style="font-size:10px;font-weight:400;margin-left:8px;opacity:.75">${currentLang==='en'?'selected year · 1,000 min filter':'ano selecionado · filtro 1.000 min'}</span>
+  </td></tr>`;
+  if (botoYear) {
+    const nameStyle = 'background:linear-gradient(90deg,#FFF8E1,#FFFDE7);border-left:4px solid #F59E0B !important;';
+    const badge = `<span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px;margin-right:5px">📌 ${selYear}</span>`;
+    html += `<tr class="boto-ref-row">${buildDataRow(botoYear, 'background:#FFFBEA;', 'team-name ' + nameStyle, badge, '')}</tr>`;
+  } else {
+    html += `<tr><td colspan="7" style="padding:10px 14px;font-size:11px;color:var(--txt2);font-style:italic;background:#FFFBEA">${currentLang==='en'?'Botafogo did not participate in the selected year or no data available.':'Botafogo não participou no ano selecionado ou sem dados disponíveis.'}</td></tr>`;
+  }
+
+  // ── Botafogo 2026 fixed (black section) ──────────────────────────────────
+  const BLACK = '#111827';
+  const b26 = BOTO_2026;
+  const sc26 = balanceScore({'Até 20':pct(b26,'Até 20')||0,'21 a 25':pct(b26,'21 a 25')||0,'26 a 29':pct(b26,'26 a 29')||0,'30+':pct(b26,'30+')||0});
+  const sc26Color = sc26>=75?'#22C55E':sc26>=55?'#F59E0B':'#EF4444';
+
+  html += `<tr><td colspan="7" style="background:${BLACK};color:#F9FAFB;font-weight:800;font-size:11px;padding:6px 12px;border-top:3px solid #F59E0B;border-bottom:2px solid #374151">
+    ⚫ Botafogo – 2026
+    <span style="background:#F59E0B;color:#000;font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px;margin-left:8px">${currentLang==='en'?'LIVE · 300 min':'EM CURSO · 300 min'}</span>
+    <span style="font-size:10px;font-weight:400;margin-left:6px;color:#9CA3AF">${currentLang==='en'?'always shown · compare with any year':'sempre exibido · compare com qualquer ano'}</span>
+  </td></tr>`;
+
+  const b26NameStyle = `background:${BLACK};border-left:4px solid #F59E0B !important;color:#F9FAFB;`;
+  const b26Badge = `<span style="background:#F59E0B;color:#000;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px;margin-right:5px">⚫ 2026</span>`;
+  html += `<tr style="background:${BLACK}">${buildDataRow(b26, `background:${BLACK};color:#F9FAFB;`, b26NameStyle, b26Badge, `<br><span style="font-size:9px;color:#9CA3AF;font-weight:500">${currentLang==='en'?'live · 300 min':'em curso · 300 min'}</span>`)}</tr>`;
+
+  html += `<tr><td colspan="7" style="height:3px;background:linear-gradient(90deg,#F59E0B,transparent)"></td></tr>`;
+
   html += '</tbody></table></div>';
   html += `<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;align-items:center">
     <span style="font-size:10px;font-weight:700;color:var(--txt2)">${t('tyg_legend')}:</span>
@@ -1454,18 +1428,21 @@ function initYearDisplayChips() {
   const wrap = document.getElementById('yearDisplayChips');
   YEARS_CALC.forEach(y => {
     const d = document.createElement('div');
-    d.className = 'ychip' + ([2023,2024,2025].includes(y) ? ' active' : '');
+    d.dataset.year = y;
+    d.className = 'ychip' + (y === 2025 ? ' active' : '');
     d.textContent = y;
     d.addEventListener('click', () => {
-      if (DISPLAY_YEARS.has(y)) {
-        if (DISPLAY_YEARS.size > 1) { DISPLAY_YEARS.delete(y); d.classList.remove('active'); }
-      } else {
-        DISPLAY_YEARS.add(y); d.classList.add('active');
-      }
+      // Radio: deselect all, select only this one
+      wrap.querySelectorAll('.ychip').forEach(c => c.classList.remove('active'));
+      d.classList.add('active');
+      DISPLAY_YEARS.clear();
+      DISPLAY_YEARS.add(y);
       if (_lastTeams) renderTeamYearGrid(_lastTeams);
     });
     wrap.appendChild(d);
   });
+  DISPLAY_YEARS.clear();
+  DISPLAY_YEARS.add(2025);
 }
 
 // ─── RENDER IMBALANCE GRID ───────────────────────────────────────────────────
@@ -1669,7 +1646,10 @@ function init() {
 
 window.resetFilters = function() {
   state.minMin=1000; state.posMin=1; state.posMax=20;
-  YEARS_CALC.forEach(y=>state.years.add(y));
+  DISPLAY_YEARS.clear(); DISPLAY_YEARS.add(2025);
+  document.querySelectorAll('#yearDisplayChips .ychip').forEach(c => {
+    c.classList.toggle('active', +c.textContent === 2025);
+  });
   ['G5','Z4','Outros'].forEach(v=>state.g5z4.add(v));
   ALL_POS.forEach(p=>state.pos.add(p));
   ALL_TEAMS.forEach(t=>state.teams.add(t));
