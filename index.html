@@ -414,7 +414,70 @@ canvas{max-height:220px;}
 .ei-impl-card p { font-size: 11.5px; color: var(--txt2); line-height: 1.65; margin: 0; }
 .ei-impl-card p strong { color: var(--txt); }
 
-@media (max-width: 1000px) {
+/* ── SIMULATOR ─────────────────────────────────────────────── */
+.sim-player {
+  position: absolute; transform: translate(-50%,-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: default; user-select: none; z-index: 10;
+  transition: transform .2s;
+}
+.sim-player:hover { transform: translate(-50%,-50%) scale(1.08); }
+.sim-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: #fff;
+  border: 2.5px solid rgba(255,255,255,.6);
+  position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  flex-shrink: 0;
+}
+.sim-avatar .sim-remove {
+  position: absolute; top: -5px; right: -5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #EF4444; color: #fff; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-weight: 800; line-height: 1;
+  opacity: 0; transition: opacity .15s;
+  border: 1.5px solid #fff;
+}
+.sim-player:hover .sim-remove { opacity: 1; }
+.sim-player-name {
+  font-size: 9px; font-weight: 700; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  background: rgba(0,0,0,.45); border-radius: 4px;
+  padding: 1px 4px; white-space: nowrap; max-width: 68px;
+  overflow: hidden; text-overflow: ellipsis; text-align: center;
+}
+.sim-player-age {
+  font-size: 8px; font-weight: 600; color: rgba(255,255,255,.85);
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.sim-pos-label {
+  font-size: 8px; font-weight: 800; color: rgba(255,255,255,.6);
+  letter-spacing: .5px;
+}
+/* bench card */
+.bench-card {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 8px; border-radius: 8px;
+  border: 1.5px solid; font-size: 10px; font-weight: 700;
+  position: relative;
+}
+.bench-remove {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #EF4444; color: #fff; font-size: 9px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-weight: 800; margin-left: 2px;
+  flex-shrink: 0;
+}
+/* ideal indicator in sim */
+.sim-ii {
+  padding: 7px 6px; border-radius: 7px; text-align: center;
+}
+.sim-ii-val { font-size: 17px; font-weight: 800; line-height: 1; }
+.sim-ii-lbl { font-size: 9px; font-weight: 600; margin-top: 1px; color: var(--txt2); }
+.sim-ii-tgt { font-size: 9px; opacity: .65; }
+.sim-ii-diff { font-size: 10px; font-weight: 700; margin-top: 2px; }
+
   .ei-conclusions { grid-template-columns: 1fr; }
   .ei-implications { grid-template-columns: 1fr 1fr; }
   .ei-model-bands { grid-template-columns: 1fr 1fr; }
@@ -501,6 +564,7 @@ canvas{max-height:220px;}
     <div class="tab" onclick="showTab('timeline')" data-i18n="tab_timeline">📅 Série Histórica</div>
     <div class="tab" onclick="showTab('scatter')" data-i18n="tab_scatter">🎯 Correlação</div>
     <div class="tab" onclick="showTab('table')" data-i18n="tab_table">📋 Tabela Detalhada</div>
+    <div class="tab" onclick="showTab('simulator')" style="color:#F59E0B;border-color:#F59E0B" data-i18n="tab_simulator">🧪 Simulador</div>
   </div>
 
 
@@ -822,6 +886,171 @@ canvas{max-height:220px;}
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
+      </div>
+    </div>
+  </div><!-- /tab-table -->
+
+  <!-- TAB 5: SQUAD SIMULATOR -->
+  <div class="tab-content" id="tab-simulator">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0D0D1A,#1F3864);border-radius:10px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px">
+      <div style="font-size:32px">🧪</div>
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#F59E0B;margin-bottom:4px">SIMULADOR DE ELENCO</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">Monte e teste composições etárias em tempo real</div>
+        <div style="font-size:11px;color:#9BB4D8;margin-top:2px">Elenco base: Botafogo 2026 (≥300 min) · Adicione, remova ou troque jogadores e veja o impacto no perfil</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button onclick="simReset()" style="padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;background:#FEF3C7;color:#92400E;border:1.5px solid #F59E0B;cursor:pointer">↺ Resetar</button>
+        <button onclick="simClearAll()" style="padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;background:#FEE2E2;color:#991B1B;border:1.5px solid #EF4444;cursor:pointer">✕ Limpar tudo</button>
+      </div>
+    </div>
+
+    <!-- Live Profile Bar -->
+    <div class="card" id="simProfileCard" style="margin-bottom:14px;padding:14px 16px">
+      <div class="card-title">📊 Perfil Etário Atual do Elenco Simulado</div>
+      <div id="simProfileBar" style="height:26px;border-radius:5px;overflow:hidden;display:flex;margin-bottom:8px"></div>
+      <div id="simProfileLabels" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--txt2);font-weight:600">Score de Equilíbrio:</span>
+          <span id="simScore" style="font-size:22px;font-weight:800">–</span>
+          <span id="simScoreLabel" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px">–</span>
+        </div>
+        <div style="margin-left:auto;font-size:10px;color:var(--txt2)" id="simPlayerCount">0 jogadores</div>
+      </div>
+      <!-- vs Ideal comparison -->
+      <div id="simVsIdeal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start">
+
+      <!-- LEFT: Pitch -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:#1A1A2E;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.5px">⚽ Campo – Formação 4-3-3</span>
+          <span style="font-size:10px;color:#9BB4D8">Clique em × para remover</span>
+        </div>
+
+        <!-- Pitch SVG -->
+        <div id="simPitch" style="
+          background: radial-gradient(ellipse at center, #2d7a3a 0%, #1e5c2a 100%);
+          position:relative; width:100%; height:380px;
+          overflow:hidden; border-bottom:3px solid #1A1A2E;
+        ">
+          <!-- Field lines -->
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 600 380" preserveAspectRatio="none">
+            <!-- Outer boundary -->
+            <rect x="10" y="10" width="580" height="350" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+            <!-- Centre line -->
+            <line x1="300" y1="10" x2="300" y2="360" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <!-- Centre circle -->
+            <circle cx="300" cy="185" r="50" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <circle cx="300" cy="185" r="3" fill="rgba(255,255,255,.4)"/>
+            <!-- Top penalty area -->
+            <rect x="170" y="10" width="260" height="80" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <rect x="220" y="10" width="160" height="40" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <circle cx="300" cy="70" r="3" fill="rgba(255,255,255,.4)"/>
+            <!-- Bottom penalty area -->
+            <rect x="170" y="280" width="260" height="80" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <rect x="220" y="320" width="160" height="40" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+            <circle cx="300" cy="300" r="3" fill="rgba(255,255,255,.4)"/>
+          </svg>
+
+          <!-- Player positions container -->
+          <div id="pitchPlayers" style="position:absolute;inset:0;width:100%;height:100%"></div>
+        </div>
+
+        <!-- Bench -->
+        <div style="background:#111827;padding:10px 14px">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Banco / Reservas</div>
+          <div id="simBench" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Add player + legend -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+
+        <!-- Add player form -->
+        <div class="card" style="border:2px solid var(--accent)">
+          <div class="card-title" style="color:var(--accent)">➕ Adicionar Jogador Hipotético</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <label style="font-size:10px;font-weight:700;color:var(--txt2);display:block;margin-bottom:3px">Nome</label>
+              <input id="simAddName" type="text" placeholder="Ex: Novo Reforço" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg)">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div>
+                <label style="font-size:10px;font-weight:700;color:var(--txt2);display:block;margin-bottom:3px">Idade</label>
+                <input id="simAddAge" type="number" min="16" max="45" placeholder="Ex: 27" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg)">
+              </div>
+              <div>
+                <label style="font-size:10px;font-weight:700;color:var(--txt2);display:block;margin-bottom:3px">Posição</label>
+                <select id="simAddPos" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg)">
+                  <option value="GK">Goleiro</option>
+                  <option value="RB">Lateral Dir.</option>
+                  <option value="CB">Zagueiro</option>
+                  <option value="LB">Lateral Esq.</option>
+                  <option value="CM">Meia Centro</option>
+                  <option value="RW">Ponta Dir.</option>
+                  <option value="CF">Centroavante</option>
+                  <option value="LW">Ponta Esq.</option>
+                  <option value="BEN">Banco</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="simAddPlayer()" style="width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;margin-top:2px">
+              ➕ Adicionar ao Elenco
+            </button>
+          </div>
+        </div>
+
+        <!-- Faixa Legend -->
+        <div class="card">
+          <div class="card-title">Faixas Etárias</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:3px;background:#EF4444;flex-shrink:0"></div>
+              <div><div style="font-size:11px;font-weight:700">Até 20 anos</div><div style="font-size:10px;color:var(--txt2)">Meta: ≤ 10%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:3px;background:#F59E0B;flex-shrink:0"></div>
+              <div><div style="font-size:11px;font-weight:700">21 a 25 anos</div><div style="font-size:10px;color:var(--txt2)">Meta: ~30%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:3px;background:#22C55E;flex-shrink:0"></div>
+              <div><div style="font-size:11px;font-weight:700">26 a 29 anos ⭐</div><div style="font-size:10px;color:var(--txt2)">Meta: ~30% · Faixa crítica</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:3px;background:#8B5CF6;flex-shrink:0"></div>
+              <div><div style="font-size:11px;font-weight:700">Acima de 30</div><div style="font-size:10px;color:var(--txt2)">Meta: ~30%</div></div>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+          <div style="font-size:10px;color:var(--txt2);line-height:1.6">
+            <strong>Score ≥75</strong> = Equilibrado ✅<br>
+            <strong>Score 55–74</strong> = Moderado ⚠️<br>
+            <strong>Score &lt;55</strong> = Desequilibrado 🔴
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="card">
+          <div class="card-title">⚡ Cenários Rápidos</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <button onclick="simScenario('young')" style="width:100%;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;background:#FEE2E2;color:#991B1B;border:1px solid #EF4444;cursor:pointer;text-align:left">
+              📉 +3 jovens ≤20 (impacto negativo)
+            </button>
+            <button onclick="simScenario('peak')" style="width:100%;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534;border:1px solid #22C55E;cursor:pointer;text-align:left">
+              📈 +3 reforços 26-29 (ideal)
+            </button>
+            <button onclick="simScenario('veteran')" style="width:100%;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;background:#EDE9FE;color:#5B21B6;border:1px solid #8B5CF6;cursor:pointer;text-align:left">
+              🧓 +3 veteranos 30+ (alerta)
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1557,13 +1786,14 @@ function update() {
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
 function showTab(id) {
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    const ids=['insights','balance','timeline','scatter','table'];
-    t.classList.toggle('active', ids[i]===id);
+  document.querySelectorAll('.tab').forEach((tab,i)=>{
+    const ids=['insights','balance','timeline','scatter','table','simulator'];
+    tab.classList.toggle('active', ids[i]===id);
   });
   document.querySelectorAll('.tab-content').forEach(c => {
     c.classList.toggle('active', c.id==='tab-'+id);
   });
+  if (id === 'simulator') { requestAnimationFrame(function(){ requestAnimationFrame(simInit); }); }
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
@@ -1642,7 +1872,279 @@ function init() {
 
   initYearDisplayChips();
   update();
+  // Pre-build simulator so it's ready when tab opens
+  simRenderPitch();
+  simRenderProfile();
 }
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧪 SQUAD SIMULATOR
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Faixa colour helper
+function simFaixaColor(age) {
+  if (age <= 20) return {bg:'#EF4444', key:'u20'};
+  if (age <= 25) return {bg:'#F59E0B', key:'21'};
+  if (age <= 29) return {bg:'#22C55E', key:'26'};
+  return {bg:'#8B5CF6', key:'30'};
+}
+function simFaixaLabel(age) {
+  if (age <= 20) return 'Até 20';
+  if (age <= 25) return '21-25';
+  if (age <= 29) return '26-29';
+  return '30+';
+}
+
+// ── Botafogo 2026 base squad ──────────────────────────────────────────────────
+// Formation 4-3-3: GK | RB CB CB LB | CM CM CM | RW CF LW
+// Positions as % of pitch (left=attack top, right=defence — vertical pitch)
+// We use a top-view where top = attacking end, bottom = defending end
+// x% from left, y% from top
+const SIM_POSITIONS = {
+  GK:  { x:50, y:88, label:'GL' },
+  RB:  { x:80, y:70, label:'LD' },
+  CB1: { x:62, y:72, label:'ZA' },
+  CB2: { x:38, y:72, label:'ZA' },
+  LB:  { x:20, y:70, label:'LE' },
+  CM1: { x:65, y:50, label:'MC' },
+  CM2: { x:50, y:46, label:'MC' },
+  CM3: { x:35, y:50, label:'MC' },
+  RW:  { x:78, y:24, label:'PD' },
+  CF:  { x:50, y:18, label:'CA' },
+  LW:  { x:22, y:24, label:'PE' },
+};
+
+const SIM_BASE_SQUAD = [
+  // Starters (mapped to formation slots)
+  { id:'s1',  name:'Raul Steffens', age:28, slot:'GK',  onPitch:true  },
+  { id:'s2',  name:'Vitinho',       age:26, slot:'RB',  onPitch:true  },
+  { id:'s3',  name:'Newton',        age:26, slot:'CB1', onPitch:true  },
+  { id:'s4',  name:'A. Barboza',    age:31, slot:'CB2', onPitch:true  },
+  { id:'s5',  name:'Alex Telles',   age:33, slot:'LB',  onPitch:true  },
+  { id:'s6',  name:'Danilo',        age:24, slot:'CM1', onPitch:true  },
+  { id:'s7',  name:'C. Medina',     age:23, slot:'CM2', onPitch:true  },
+  { id:'s8',  name:'Edenílson',     age:36, slot:'CM3', onPitch:true  },
+  { id:'s9',  name:'J. Barrera',    age:19, slot:'RW',  onPitch:true  },
+  { id:'s10', name:'Arthur Cabral', age:27, slot:'CF',  onPitch:true  },
+  { id:'s11', name:'A. Montoro',    age:18, slot:'LW',  onPitch:true  },
+  // Bench
+  { id:'b1',  name:'Léo Linck',     age:25, slot:'BEN', onPitch:false },
+  { id:'b2',  name:'Neto',          age:36, slot:'BEN', onPitch:false },
+  { id:'b3',  name:'Mateo Ponte',   age:22, slot:'BEN', onPitch:false },
+  { id:'b4',  name:'G. Justino',    age:19, slot:'BEN', onPitch:false },
+  { id:'b5',  name:'N. Ferraresi',  age:27, slot:'BEN', onPitch:false },
+  { id:'b6',  name:'Bastos',        age:34, slot:'BEN', onPitch:false },
+  { id:'b7',  name:'Matheus M.',    age:22, slot:'BEN', onPitch:false },
+  { id:'b8',  name:'Artur',         age:28, slot:'BEN', onPitch:false },
+  { id:'b9',  name:'Allan',         age:35, slot:'BEN', onPitch:false },
+  { id:'b10', name:'Nathan F.',     age:21, slot:'BEN', onPitch:false },
+  { id:'b11', name:'L. Villalba',   age:24, slot:'BEN', onPitch:false },
+  { id:'b12', name:'G. Abdias',     age:19, slot:'BEN', onPitch:false },
+  { id:'b13', name:'Caio Valle',    age:18, slot:'BEN', onPitch:false },
+  { id:'b14', name:'S. Rodríguez',  age:26, slot:'BEN', onPitch:false },
+  { id:'b15', name:'A. Novaes',     age:17, slot:'BEN', onPitch:false },
+];
+
+// Live squad state (deep copy)
+let simSquad = JSON.parse(JSON.stringify(SIM_BASE_SQUAD));
+let simIdCounter = 100;
+
+// Map from add-form pos to pitch slot (smart slot finding)
+const POS_SLOT_MAP = {
+  GK: ['GK'], RB: ['RB'], CB: ['CB1','CB2'],
+  LB: ['LB'], CM: ['CM1','CM2','CM3'],
+  RW: ['RW'], CF: ['CF'], LW: ['LW'], BEN: ['BEN']
+};
+
+// ── Core profile calculator ───────────────────────────────────────────────────
+function simCalcProfile() {
+  const counts = {'Até 20':0,'21 a 25':0,'26 a 29':0,'30+':0};
+  simSquad.forEach(p => {
+    if (p.age <= 20) counts['Até 20']++;
+    else if (p.age <= 25) counts['21 a 25']++;
+    else if (p.age <= 29) counts['26 a 29']++;
+    else counts['30+']++;
+  });
+  const total = simSquad.length || 1;
+  const pcts = {};
+  for (const k in counts) pcts[k] = +(counts[k]/total*100).toFixed(1);
+  return { counts, pcts, total };
+}
+
+// ── Render profile bar + score ────────────────────────────────────────────────
+function simRenderProfile() {
+  const { pcts, total } = simCalcProfile();
+  const IDEAL   = {'Até 20':[0,10],'21 a 25':[20,40],'26 a 29':[20,40],'30+':[20,40]};
+  const IDEAL_C = {'Até 20':7,'21 a 25':30,'26 a 29':30,'30+':30};
+  const COLORS  = {'Até 20':'#EF4444','21 a 25':'#F59E0B','26 a 29':'#22C55E','30+':'#8B5CF6'};
+  const FAIXAS  = ['Até 20','21 a 25','26 a 29','30+'];
+
+  // Bar
+  const bar = document.getElementById('simProfileBar');
+  bar.innerHTML = FAIXAS.map(f => {
+    const v = pcts[f]||0;
+    return `<div style="width:${v}%;background:${COLORS[f]};height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;overflow:hidden;transition:width .4s ease">${v>6?v+'%':''}</div>`;
+  }).join('');
+
+  // Labels
+  document.getElementById('simProfileLabels').innerHTML = FAIXAS.map(f =>
+    `<span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700">
+      <span style="width:10px;height:10px;border-radius:2px;background:${COLORS[f]};display:inline-block"></span>
+      ${f}: <strong>${pcts[f]||0}%</strong>
+    </span>`
+  ).join('');
+
+  // Score
+  let dev = Math.abs((pcts['Até 20']||0)-7);
+  ['21 a 25','26 a 29','30+'].forEach(f => dev += Math.abs((pcts[f]||0)-30));
+  const score = Math.max(0, Math.round(100-dev));
+  const scoreEl = document.getElementById('simScore');
+  const scoreLbl = document.getElementById('simScoreLabel');
+  scoreEl.textContent = score;
+  if (score >= 75) {
+    scoreEl.style.color = '#22C55E';
+    scoreLbl.textContent = '✅ Equilibrado';
+    scoreLbl.style.background = '#DCFCE7'; scoreLbl.style.color = '#15803D';
+  } else if (score >= 55) {
+    scoreEl.style.color = '#F59E0B';
+    scoreLbl.textContent = '⚠️ Moderado';
+    scoreLbl.style.background = '#FEF3C7'; scoreLbl.style.color = '#B45309';
+  } else {
+    scoreEl.style.color = '#EF4444';
+    scoreLbl.textContent = '🔴 Desequil.';
+    scoreLbl.style.background = '#FEE2E2'; scoreLbl.style.color = '#B91C1C';
+  }
+  document.getElementById('simPlayerCount').textContent = `${total} jogador${total!==1?'es':''}`;
+
+  // vs Ideal grid
+  const vsEl = document.getElementById('simVsIdeal');
+  vsEl.innerHTML = FAIXAS.map(f => {
+    const v = pcts[f]||0;
+    const [lo,hi] = IDEAL[f];
+    const center = IDEAL_C[f];
+    const ok = v>=lo && v<=hi;
+    const warn = !ok && Math.abs(v-center)<10;
+    const bg = ok?'#DCFCE7':warn?'#FEF3C7':'#FEE2E2';
+    const diff = (v-center).toFixed(0);
+    const diffTxt = diff>0?'+'+diff:diff;
+    const arrow = ok?'✓':v>center?'▲':'▼';
+    const col = COLORS[f];
+    return `<div class="sim-ii" style="background:${bg}">
+      <div class="sim-ii-val" style="color:${col}">${v}%</div>
+      <div class="sim-ii-lbl">${f}</div>
+      <div class="sim-ii-tgt">Meta: ${lo}–${hi}%</div>
+      <div class="sim-ii-diff" style="color:${ok?'#15803D':v>center?'#B45309':'#B91C1C'}">${arrow} ${diffTxt}pp</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render pitch ──────────────────────────────────────────────────────────────
+function simRenderPitch() {
+  const container = document.getElementById('pitchPlayers');
+  const bench     = document.getElementById('simBench');
+  container.innerHTML = '';
+  bench.innerHTML = '';
+
+  simSquad.forEach(p => {
+    const col = simFaixaColor(p.age);
+    if (p.onPitch && SIM_POSITIONS[p.slot]) {
+      const pos = SIM_POSITIONS[p.slot];
+      const el = document.createElement('div');
+      el.className = 'sim-player';
+      el.style.left = pos.x + '%';
+      el.style.top  = pos.y + '%';
+      el.innerHTML = `
+        <div class="sim-pos-label">${pos.label}</div>
+        <div class="sim-avatar" style="background:${col.bg}">
+          ${p.age}
+          <span class="sim-remove" onclick="simRemovePlayer('${p.id}')">×</span>
+        </div>
+        <div class="sim-player-name" title="${p.name}">${p.name.split(' ')[0]}</div>
+      `;
+      container.appendChild(el);
+    } else {
+      // Bench card
+      const bc = document.createElement('div');
+      bc.className = 'bench-card';
+      bc.style.background = col.bg + '22';
+      bc.style.borderColor = col.bg;
+      bc.style.color = '#1A1A2E';
+      bc.innerHTML = `
+        <div style="width:10px;height:10px;border-radius:50%;background:${col.bg};flex-shrink:0"></div>
+        <span style="font-size:10px;font-weight:700">${p.name.split(' ')[0]}</span>
+        <span style="font-size:9px;color:#6B7280;font-weight:600">${p.age}</span>
+        <div class="bench-remove" onclick="simRemovePlayer('${p.id}')">×</div>
+      `;
+      bench.appendChild(bc);
+    }
+  });
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+window.simRemovePlayer = function(id) {
+  simSquad = simSquad.filter(p => p.id !== id);
+  simRenderPitch();
+  simRenderProfile();
+};
+
+window.simAddPlayer = function() {
+  const name = document.getElementById('simAddName').value.trim() || 'Novo Jogador';
+  const age  = parseInt(document.getElementById('simAddAge').value);
+  const posKey = document.getElementById('simAddPos').value;
+
+  if (!age || age < 14 || age > 50) {
+    alert('Por favor insira uma idade válida (14–50).'); return;
+  }
+
+  // Find slot: prefer empty pitch slot, else bench
+  const candidates = POS_SLOT_MAP[posKey] || ['BEN'];
+  const usedSlots  = simSquad.filter(p=>p.onPitch).map(p=>p.slot);
+  let slot = candidates.find(s => s !== 'BEN' && !usedSlots.includes(s));
+  const onPitch = !!slot;
+  if (!slot) slot = 'BEN';
+
+  simSquad.push({ id:'add_'+(++simIdCounter), name, age, slot, onPitch });
+  document.getElementById('simAddName').value = '';
+  document.getElementById('simAddAge').value  = '';
+  simRenderPitch();
+  simRenderProfile();
+};
+
+window.simReset = function() {
+  simSquad = JSON.parse(JSON.stringify(SIM_BASE_SQUAD));
+  simIdCounter = 100;
+  simRenderPitch();
+  simRenderProfile();
+};
+
+window.simClearAll = function() {
+  simSquad = [];
+  simRenderPitch();
+  simRenderProfile();
+};
+
+window.simScenario = function(type) {
+  const scenarios = {
+    young:   [{name:'Base A', age:18},{name:'Base B', age:19},{name:'Base C', age:17}],
+    peak:    [{name:'Reforço A', age:27},{name:'Reforço B', age:28},{name:'Reforço C', age:26}],
+    veteran: [{name:'Veterano A', age:33},{name:'Veterano B', age:35},{name:'Veterano C', age:32}],
+  };
+  scenarios[type].forEach(p => {
+    simSquad.push({ id:'sc_'+(++simIdCounter), name:p.name, age:p.age, slot:'BEN', onPitch:false });
+  });
+  simRenderPitch();
+  simRenderProfile();
+};
+
+// ── Init (called when tab is first opened) ────────────────────────────────────
+function simInit() {
+  simRenderPitch();
+  simRenderProfile();
+}
+
+// ── Hook into showTab for simulator init ─────────────────────────────────────
+// (simInit is called directly from showTab which already handles 'simulator')
 
 window.resetFilters = function() {
   state.minMin=1000; state.posMin=1; state.posMax=20;
@@ -1771,6 +2273,7 @@ const I18N = {
     tyg_legend:'Legenda barra', tyg_ok:'ideal', tyg_warn:'próx.', tyg_bad:'desequil.',
     tyg_footnote:'sc = score equilíbrio (0–100) · Modelo: ≤10% / 30% / 30% / 30%',
     tyg_z4zone:'Zona de Rebaixamento',
+    tab_simulator:'🧪 Simulador',
     ei_mp_caption:'Perfil médio real G5 · 2021–2025 (+1.000 min)',
     c5_trend_caption:'Evolução da idade média (+1.000 min) · 2021–2025',
     btl_2022:'Equilíbrio quase perfeito, sem massa crítica de qualidade',
@@ -1884,6 +2387,7 @@ const I18N = {
     tyg_legend:'Bar legend', tyg_ok:'ideal', tyg_warn:'close', tyg_bad:'imbal.',
     tyg_footnote:'sc = balance score (0–100) · Model: ≤10% / 30% / 30% / 30%',
     tyg_z4zone:'Relegation Zone',
+    tab_simulator:'🧪 Simulator',
     ei_mp_caption:'Real average G5 profile · 2021–2025 (+1,000 min)',
     c5_trend_caption:'Average age evolution (+1,000 min) · 2021–2025',
     btl_2022:'Near-perfect balance, without critical mass of quality',
