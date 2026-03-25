@@ -28,6 +28,11 @@ header h1{font-size:16px;font-weight:800;line-height:1.3;}
 header p{font-size:11px;color:#9BB4D8;margin-top:2px;}
 .header-badges{margin-left:auto;display:flex;gap:8px;align-items:center;}
 .hbadge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.lang-toggle{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;
+  border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff;
+  cursor:pointer;letter-spacing:.5px;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.lang-toggle:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.7);}
+.lang-toggle .lt-active{color:#F59E0B;}
 
 /* LAYOUT */
 .main{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 64px);}
@@ -423,55 +428,58 @@ canvas{max-height:220px;}
 <header>
   <div class="logo">⚽</div>
   <div>
-    <h1>Perfil de Idade × Desempenho – Campeonato Brasileiro</h1>
-    <p>BFR Analytics · Fonte: Wyscout · Cobertura: 2019–2025 · G5 &amp; Z4</p>
+    <h1 data-i18n="header_title">Perfil de Idade × Desempenho – Campeonato Brasileiro</h1>
+    <p data-i18n="header_sub">BFR Analytics · Fonte: Wyscout · Cobertura: 2019–2025 · G5 &amp; Z4</p>
   </div>
   <div class="header-badges">
-    <span class="hbadge" style="background:var(--g5l);color:var(--g5)">G5 · Top 5</span>
-    <span class="hbadge" style="background:var(--z4l);color:var(--z4)">Z4 · Rebaixados</span>
+    <span class="hbadge" style="background:var(--g5l);color:var(--g5)" data-i18n="badge_g5">G5 · Top 5</span>
+    <span class="hbadge" style="background:var(--z4l);color:var(--z4)" data-i18n="badge_z4">Z4 · Rebaixados</span>
     <span class="hbadge" style="background:#DCFCE7;color:#15803D">Modelo: ≤10/30/30/30</span>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+      🌐 <span class="lt-active">PT</span> / EN
+    </button>
   </div>
 </header>
 
 <div class="main">
 <!-- SIDEBAR -->
 <aside>
-  <div class="sh">🔍 Filtros</div>
+  <div class="sh" data-i18n="sb_filters">🔍 Filtros</div>
   <div class="filter-group">
-    <label class="fl">Minutagem mínima</label>
+    <label class="fl" data-i18n="sb_minmin">Minutagem mínima</label>
     <input type="range" id="minMin" min="90" max="3000" step="90" value="1000">
     <div class="range-row"><span>90</span><span class="range-val" id="minMinVal">1.000 min</span><span>3.000</span></div>
   </div>
   <hr class="divider">
-  <div class="sh">📅 Ano</div>
+  <div class="sh" data-i18n="sb_year">📅 Ano</div>
   <div class="chip-group" id="yearChips"></div>
   <hr class="divider">
-  <div class="sh">🏆 Grupo</div>
+  <div class="sh" data-i18n="sb_group">🏆 Grupo</div>
   <div class="chip-group" id="g5z4Chips">
-    <div class="chip active" data-g5z4="G5" style="border-color:var(--g5);color:var(--g5);background:var(--g5l)">G5 – Top5</div>
-    <div class="chip active" data-g5z4="Z4" style="border-color:var(--z4);color:var(--z4);background:var(--z4l)">Z4 – Rebaixados</div>
-    <div class="chip active" data-g5z4="Outros" style="border-color:#64748B;color:#64748B;background:#F1F5F9">Demais</div>
+    <div class="chip active" data-g5z4="G5" style="border-color:var(--g5);color:var(--g5);background:var(--g5l)" data-i18n="chip_g5">G5 – Top5</div>
+    <div class="chip active" data-g5z4="Z4" style="border-color:var(--z4);color:var(--z4);background:var(--z4l)" data-i18n="chip_z4">Z4 – Rebaixados</div>
+    <div class="chip active" data-g5z4="Outros" style="border-color:#64748B;color:#64748B;background:#F1F5F9" data-i18n="chip_outros">Demais</div>
   </div>
   <hr class="divider">
-  <div class="sh">⚽ Posição em Campo</div>
+  <div class="sh" data-i18n="sb_pos">⚽ Posição em Campo</div>
   <div class="chip-group" id="posChips"></div>
   <hr class="divider">
-  <div class="sh">🏟️ Equipe</div>
+  <div class="sh" data-i18n="sb_team">🏟️ Equipe</div>
   <select id="teamSel" multiple></select>
-  <p style="font-size:10px;color:var(--txt2);margin-top:3px">Ctrl+clique para múltiplas</p>
+  <p style="font-size:10px;color:var(--txt2);margin-top:3px" data-i18n="sb_ctrl">Ctrl+clique para múltiplas</p>
   <hr class="divider">
-  <div class="sh">📊 Posição no Campeonato</div>
+  <div class="sh" data-i18n="sb_standing">📊 Posição no Campeonato</div>
   <div class="filter-group">
-    <label class="fl">Posição mín.</label>
+    <label class="fl" data-i18n="sb_posmin">Posição mín.</label>
     <input type="range" id="posMin" min="1" max="20" value="1">
     <div class="range-row"><span>1º</span><span class="range-val" id="posMinVal">1º</span><span>20º</span></div>
   </div>
   <div class="filter-group" style="margin-top:4px">
-    <label class="fl">Posição máx.</label>
+    <label class="fl" data-i18n="sb_posmax">Posição máx.</label>
     <input type="range" id="posMax" min="1" max="20" value="20">
     <div class="range-row"><span>1º</span><span class="range-val" id="posMaxVal">20º</span><span>20º</span></div>
   </div>
-  <button class="btn-reset" onclick="resetFilters()">↺ Resetar Filtros</button>
+  <button class="btn-reset" onclick="resetFilters()" data-i18n="sb_reset">↺ Resetar Filtros</button>
 </aside>
 
 <!-- CONTENT -->
@@ -479,20 +487,20 @@ canvas{max-height:220px;}
 
   <!-- KPIs -->
   <div class="kpi-row">
-    <div class="kpi"><div class="kl">Jogadores</div><div class="kv" id="kpiP">–</div><div class="ks" id="kpiPs">–</div></div>
-    <div class="kpi"><div class="kl">Times/Temp.</div><div class="kv" id="kpiT">–</div><div class="ks" id="kpiTs">–</div></div>
-    <div class="kpi"><div class="kl">Média Idade</div><div class="kv" id="kpiA">–</div><div class="ks">anos</div></div>
-    <div class="kpi"><div class="kl">Score G5</div><div class="kv" id="kpiSG">–</div><div class="ks">Equilíbrio</div></div>
-    <div class="kpi"><div class="kl">Score Z4</div><div class="kv" id="kpiSZ">–</div><div class="ks">Equilíbrio</div></div>
+    <div class="kpi"><div class="kl" data-i18n="kpi_players">Jogadores</div><div class="kv" id="kpiP">–</div><div class="ks" id="kpiPs">–</div></div>
+    <div class="kpi"><div class="kl" data-i18n="kpi_teams">Times/Temp.</div><div class="kv" id="kpiT">–</div><div class="ks" id="kpiTs">–</div></div>
+    <div class="kpi"><div class="kl" data-i18n="kpi_age">Média Idade</div><div class="kv" id="kpiA">–</div><div class="ks" data-i18n="kpi_years">anos</div></div>
+    <div class="kpi"><div class="kl">Score G5</div><div class="kv" id="kpiSG">–</div><div class="ks" data-i18n="kpi_balance">Equilíbrio</div></div>
+    <div class="kpi"><div class="kl">Score Z4</div><div class="kv" id="kpiSZ">–</div><div class="ks" data-i18n="kpi_balance2">Equilíbrio</div></div>
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <div class="tab" onclick="showTab('insights')">🏆 Análise Executiva</div>
-    <div class="tab active" onclick="showTab('balance')">⚖️ Equilíbrio G5 vs Z4</div>
-    <div class="tab" onclick="showTab('timeline')">📅 Série Histórica</div>
-    <div class="tab" onclick="showTab('scatter')">🎯 Correlação</div>
-    <div class="tab" onclick="showTab('table')">📋 Tabela Detalhada</div>
+    <div class="tab" onclick="showTab('insights')" data-i18n="tab_insights">🏆 Análise Executiva</div>
+    <div class="tab active" onclick="showTab('balance')" data-i18n="tab_balance">⚖️ Equilíbrio G5 vs Z4</div>
+    <div class="tab" onclick="showTab('timeline')" data-i18n="tab_timeline">📅 Série Histórica</div>
+    <div class="tab" onclick="showTab('scatter')" data-i18n="tab_scatter">🎯 Correlação</div>
+    <div class="tab" onclick="showTab('table')" data-i18n="tab_table">📋 Tabela Detalhada</div>
   </div>
 
 
@@ -502,60 +510,60 @@ canvas{max-height:220px;}
     <div class="ei-hero">
       <div class="ei-hero-bg"></div>
       <div class="ei-hero-content">
-        <div class="ei-eyebrow">ANÁLISE ESTRATÉGICA · GESTÃO DE ELENCO</div>
-        <h1 class="ei-title">Perfil Etário <em>vs</em> Performance</h1>
-        <p class="ei-subtitle">Campeonato Brasileiro 2021–2025 · G5 &amp; Z4 · Base: Wyscout (+1.000 min)</p>
+        <div class="ei-eyebrow" data-i18n="ei_eyebrow">ANÁLISE ESTRATÉGICA · GESTÃO DE ELENCO</div>
+        <h1 class="ei-title" data-i18n="ei_title">Perfil Etário <em>vs</em> Performance</h1>
+        <p class="ei-subtitle" data-i18n="ei_subtitle">Campeonato Brasileiro 2021–2025 · G5 &amp; Z4 · Base: Wyscout (+1.000 min)</p>
         <div class="ei-meta-row">
-          <div class="ei-meta-item"><span class="ei-meta-n">2.500</span><span class="ei-meta-l">jogadores analisados</span></div>
+          <div class="ei-meta-item"><span class="ei-meta-n">2.500</span><span class="ei-meta-l" data-i18n="ei_meta1">jogadores analisados</span></div>
           <div class="ei-meta-sep"></div>
-          <div class="ei-meta-item"><span class="ei-meta-n">100</span><span class="ei-meta-l">temporadas × clube</span></div>
+          <div class="ei-meta-item"><span class="ei-meta-n">100</span><span class="ei-meta-l" data-i18n="ei_meta2">temporadas × clube</span></div>
           <div class="ei-meta-sep"></div>
-          <div class="ei-meta-item"><span class="ei-meta-n">5</span><span class="ei-meta-l">anos de cobertura</span></div>
+          <div class="ei-meta-item"><span class="ei-meta-n">5</span><span class="ei-meta-l" data-i18n="ei_meta3">anos de cobertura</span></div>
           <div class="ei-meta-sep"></div>
-          <div class="ei-meta-item"><span class="ei-meta-n">4</span><span class="ei-meta-l">faixas etárias</span></div>
+          <div class="ei-meta-item"><span class="ei-meta-n">4</span><span class="ei-meta-l" data-i18n="ei_meta4">faixas etárias</span></div>
         </div>
       </div>
     </div>
 
     <!-- MODEL CALLOUT -->
     <div class="ei-model-strip">
-      <div class="ei-model-label">MODELO IDEAL DE COMPOSIÇÃO ETÁRIA</div>
+      <div class="ei-model-label" data-i18n="ei_model_label">MODELO IDEAL DE COMPOSIÇÃO ETÁRIA</div>
       <div class="ei-model-bands">
         <div class="ei-band" style="--bc:#EF4444;--bk:#FEE2E2">
           <span class="ei-band-pct">≤10%</span>
-          <span class="ei-band-lbl">Até 20 anos</span>
-          <span class="ei-band-desc">Promessas / base</span>
+          <span class="ei-band-lbl" data-i18n="band1_lbl">Até 20 anos</span>
+          <span class="ei-band-desc" data-i18n="band1_desc">Promessas / base</span>
         </div>
         <div class="ei-band" style="--bc:#F59E0B;--bk:#FEF3C7">
           <span class="ei-band-pct">~30%</span>
-          <span class="ei-band-lbl">21 a 25 anos</span>
-          <span class="ei-band-desc">Desenvolvimento</span>
+          <span class="ei-band-lbl" data-i18n="band2_lbl">21 a 25 anos</span>
+          <span class="ei-band-desc" data-i18n="band2_desc">Desenvolvimento</span>
         </div>
         <div class="ei-band ei-band-highlight" style="--bc:#22C55E;--bk:#DCFCE7">
           <span class="ei-band-pct">~30%</span>
-          <span class="ei-band-lbl">26 a 29 anos</span>
-          <span class="ei-band-desc">Pico — faixa crítica</span>
+          <span class="ei-band-lbl" data-i18n="band3_lbl">26 a 29 anos</span>
+          <span class="ei-band-desc" data-i18n="band3_desc">Pico — faixa crítica</span>
         </div>
         <div class="ei-band" style="--bc:#8B5CF6;--bk:#EDE9FE">
           <span class="ei-band-pct">~30%</span>
-          <span class="ei-band-lbl">Acima de 30</span>
-          <span class="ei-band-desc">Experiência</span>
+          <span class="ei-band-lbl" data-i18n="band4_lbl">Acima de 30</span>
+          <span class="ei-band-desc" data-i18n="band4_desc">Experiência</span>
         </div>
       </div>
-      <div class="ei-model-source">Referência: análise 2019–2021 (dados Wyscout) · validada na série 2021–2025</div>
+      <div class="ei-model-source" data-i18n="ei_model_source">Referência: análise 2019–2021 (dados Wyscout) · validada na série 2021–2025</div>
     </div>
 
     <!-- CONCLUSIONS GRID -->
-    <div class="ei-section-title">CONCLUSÕES DA ANÁLISE</div>
+    <div class="ei-section-title" data-i18n="ei_conclusions_title">CONCLUSÕES DA ANÁLISE</div>
     <div class="ei-conclusions">
 
       <!-- C1 -->
       <div class="ei-card ei-card-primary">
         <div class="ei-card-number">01</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag">HIPÓTESE CONFIRMADA</div>
-          <h3 class="ei-card-title">O equilíbrio etário é condição necessária — mas não suficiente</h3>
-          <p class="ei-card-text">O perfil médio real dos times G5 ao longo de 2021–2025 foi <strong>7% / 29% / 33% / 32%</strong> — notavelmente próximo do modelo ideal. A hipótese se confirma como <em>filtro negativo</em>: desequilíbrios severos predizem o fracasso com muito mais consistência do que o equilíbrio prediz o sucesso.</p>
+          <div class="ei-card-tag" data-i18n="c1_tag">HIPÓTESE CONFIRMADA</div>
+          <h3 class="ei-card-title" data-i18n="c1_title">O equilíbrio etário é condição necessária — mas não suficiente</h3>
+          <p class="ei-card-text" data-i18n="c1_text">O perfil médio real dos times G5 ao longo de 2021–2025 foi <strong>7% / 29% / 33% / 32%</strong> — notavelmente próximo do modelo ideal. A hipótese se confirma como <em>filtro negativo</em>: desequilíbrios severos predizem o fracasso com muito mais consistência do que o equilíbrio prediz o sucesso.</p>
           <div class="ei-mini-profile">
             <div class="ei-mp-bar"><div class="ei-mp-seg" style="width:7%;background:#EF4444"></div><div class="ei-mp-seg" style="width:29%;background:#F59E0B"></div><div class="ei-mp-seg" style="width:33%;background:#22C55E"></div><div class="ei-mp-seg" style="width:32%;background:#8B5CF6"></div></div>
             <div class="ei-mp-labels"><span style="color:#EF4444">7%</span><span style="color:#F59E0B">29%</span><span style="color:#22C55E">33%</span><span style="color:#8B5CF6">32%</span></div>
@@ -568,9 +576,9 @@ canvas{max-height:220px;}
       <div class="ei-card ei-card-green">
         <div class="ei-card-number">02</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag ei-tag-green">PRINCIPAL ACHADO</div>
-          <h3 class="ei-card-title">A faixa 26–29 é a âncora do desempenho — com comportamento assimétrico</h3>
-          <p class="ei-card-text">Times com a faixa 26–29 como <strong>dominante</strong> apresentaram posição média de <strong>8,7</strong> e razão G5/Z4 de 4:1. Mais revelador: concentrações extremas nessa faixa (Flamengo 2024: 69%; Fortaleza 2021: 53%; Palmeiras 2022: 50%) não penalizaram — todos foram G5. A faixa 26–29 parece ter um <em>teto assimétrico</em>: excesso não mata porque são jogadores no pico físico e técnico.</p>
+          <div class="ei-card-tag ei-tag-green" data-i18n="c2_tag">PRINCIPAL ACHADO</div>
+          <h3 class="ei-card-title" data-i18n="c2_title">A faixa 26–29 é a âncora do desempenho — com comportamento assimétrico</h3>
+          <p class="ei-card-text" data-i18n="c2_text">Times com a faixa 26–29 como <strong>dominante</strong> apresentaram posição média de <strong>8,7</strong> e razão G5/Z4 de 4:1. Mais revelador: concentrações extremas nessa faixa (Flamengo 2024: 69%; Fortaleza 2021: 53%; Palmeiras 2022: 50%) não penalizaram — todos foram G5. A faixa 26–29 parece ter um <em>teto assimétrico</em>: excesso não mata porque são jogadores no pico físico e técnico.</p>
           <div class="ei-stat-row">
             <div class="ei-stat"><span class="ei-stat-n" style="color:#22C55E">8,7</span><span class="ei-stat-l">posição média<br>dom. 26–29</span></div>
             <div class="ei-stat"><span class="ei-stat-n" style="color:#22C55E">4:1</span><span class="ei-stat-l">razão<br>G5 vs Z4</span></div>
@@ -583,9 +591,9 @@ canvas{max-height:220px;}
       <div class="ei-card ei-card-red">
         <div class="ei-card-number">03</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag ei-tag-red">FATOR DE RISCO #1</div>
-          <h3 class="ei-card-title">Excesso de veteranos (30+) é o preditor mais forte de rebaixamento</h3>
-          <p class="ei-card-text">Times com dominância na faixa 30+ têm posição média de <strong>12,1</strong> (pior de todas as faixas), com razão G5/Z4 de apenas 1:2. Times com mais de 40% de veteranos caem de 20 G5 para apenas 5 G5. O excesso de 30+ aparece como <strong>causa principal de rebaixamento em 45% dos Z4</strong> analisados — o maior índice entre todos os tipos de desequilíbrio.</p>
+          <div class="ei-card-tag ei-tag-red" data-i18n="c3_tag">FATOR DE RISCO #1</div>
+          <h3 class="ei-card-title" data-i18n="c3_title">Excesso de veteranos (30+) é o preditor mais forte de rebaixamento</h3>
+          <p class="ei-card-text" data-i18n="c3_text">Times com dominância na faixa 30+ têm posição média de <strong>12,1</strong> (pior de todas as faixas), com razão G5/Z4 de apenas 1:2. Times com mais de 40% de veteranos caem de 20 G5 para apenas 5 G5. O excesso de 30+ aparece como <strong>causa principal de rebaixamento em 45% dos Z4</strong> analisados — o maior índice entre todos os tipos de desequilíbrio.</p>
           <div class="ei-stat-row">
             <div class="ei-stat"><span class="ei-stat-n" style="color:#EF4444">12,1</span><span class="ei-stat-l">posição média<br>dom. 30+</span></div>
             <div class="ei-stat"><span class="ei-stat-n" style="color:#EF4444">45%</span><span class="ei-stat-l">dos Z4 com<br>excesso 30+</span></div>
@@ -598,9 +606,9 @@ canvas{max-height:220px;}
       <div class="ei-card ei-card-amber">
         <div class="ei-card-number">04</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag ei-tag-amber">PARADOXO DOS DADOS</div>
-          <h3 class="ei-card-title">A "falácia do equilíbrio": times perfeitamente balanceados também são rebaixados</h3>
-          <p class="ei-card-text">O achado mais contra-intuitivo: <strong>Grêmio 2021 (score 88, 17º), Sport Recife 2021 (score 87, 19º), Bahia 2021 (83, 18º)</strong> — três dos times mais bem balanceados da série foram rebaixados no mesmo ano. Isso demonstra que o perfil etário é proxy de <em>gestão de elenco saudável</em>, mas não captura qualidade individual, orçamento ou nível técnico dos jogadores em cada faixa. Um plantel com 30% de jogadores medíocres de 26–29 anos não bate um elenco estelar concentrado.</p>
+          <div class="ei-card-tag ei-tag-amber" data-i18n="c4_tag">PARADOXO DOS DADOS</div>
+          <h3 class="ei-card-title" data-i18n="c4_title">A "falácia do equilíbrio": times perfeitamente balanceados também são rebaixados</h3>
+          <p class="ei-card-text" data-i18n="c4_text">O achado mais contra-intuitivo: <strong>Grêmio 2021 (score 88, 17º), Sport Recife 2021 (score 87, 19º), Bahia 2021 (83, 18º)</strong> — três dos times mais bem balanceados da série foram rebaixados no mesmo ano. Isso demonstra que o perfil etário é proxy de <em>gestão de elenco saudável</em>, mas não captura qualidade individual, orçamento ou nível técnico dos jogadores em cada faixa. Um plantel com 30% de jogadores medíocres de 26–29 anos não bate um elenco estelar concentrado.</p>
         </div>
       </div>
 
@@ -608,9 +616,9 @@ canvas{max-height:220px;}
       <div class="ei-card ei-card-purple">
         <div class="ei-card-number">05</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag ei-tag-purple">TENDÊNCIA ESTRUTURAL</div>
-          <h3 class="ei-card-title">O Brasileirão está envelhecendo — contradição com ligas europeias</h3>
-          <p class="ei-card-text">A idade média dos titulares com +1.000 min subiu de <strong>26,2 anos em 2021</strong> para <strong>27,6 em 2025</strong>. O percentual de veteranos (30+) cresceu de 26% para 32%. Isso contradiz a tendência global de rejuvenescimento e reflete dois fenômenos estruturais: (1) exportação precoce de talentos antes dos 21 anos, e (2) retorno de jogadores experientes do exterior em fase de encerramento de carreira.</p>
+          <div class="ei-card-tag ei-tag-purple" data-i18n="c5_tag">TENDÊNCIA ESTRUTURAL</div>
+          <h3 class="ei-card-title" data-i18n="c5_title">O Brasileirão está envelhecendo — contradição com ligas europeias</h3>
+          <p class="ei-card-text" data-i18n="c5_text">A idade média dos titulares com +1.000 min subiu de <strong>26,2 anos em 2021</strong> para <strong>27,6 em 2025</strong>. O percentual de veteranos (30+) cresceu de 26% para 32%. Isso contradiz a tendência global de rejuvenescimento e reflete dois fenômenos estruturais: (1) exportação precoce de talentos antes dos 21 anos, e (2) retorno de jogadores experientes do exterior em fase de encerramento de carreira.</p>
           <div class="ei-trend-row">
             <div class="ei-trend-year" v-for="y in [2021,2022,2023,2024,2025]">
               <div class="ei-ty-label">2021</div><div class="ei-ty-age">26,2</div><div class="ei-ty-bar" style="height:30%"></div>
@@ -628,9 +636,9 @@ canvas{max-height:220px;}
       <div class="ei-card ei-card-boto">
         <div class="ei-card-number">06</div>
         <div class="ei-card-body">
-          <div class="ei-card-tag ei-tag-boto">📌 CASO BOTAFOGO</div>
-          <h3 class="ei-card-title">A jornada do Botafogo confirma o modelo — com uma nuance decisiva</h3>
-          <p class="ei-card-text">A evolução do Botafogo é o caso mais limpo da série. O equilíbrio etário criou a base; a <strong>qualidade dos jogadores 26–29 fez a diferença no título</strong>.</p>
+          <div class="ei-card-tag ei-tag-boto" data-i18n="c6_tag">📌 CASO BOTAFOGO</div>
+          <h3 class="ei-card-title" data-i18n="c6_title">A jornada do Botafogo confirma o modelo — com uma nuance decisiva</h3>
+          <p class="ei-card-text" data-i18n="c6_text">A evolução do Botafogo é o caso mais limpo da série. O equilíbrio etário criou a base; a <strong>qualidade dos jogadores 26–29 fez a diferença no título</strong>.</p>
           <div class="ei-boto-timeline">
             <div class="ei-btl-item">
               <div class="ei-btl-year">2022</div>
@@ -673,34 +681,34 @@ canvas{max-height:220px;}
     <div class="ei-synthesis">
       <div class="ei-synth-icon">◈</div>
       <div class="ei-synth-body">
-        <div class="ei-synth-label">SÍNTESE ESTRATÉGICA</div>
-        <blockquote class="ei-synth-quote">O perfil etário ideal não garante títulos — mas perfis errados garantem rebaixamento.</blockquote>
-        <p class="ei-synth-text">A correlação funciona mais como <strong>filtro negativo</strong>: excesso de 30+ mata consistência, excesso de 21–25 sem âncora cria fragilidade tática. O equilíbrio próximo ao modelo <strong>10 / 30 / 30 / 30</strong> é condição necessária para competir no G5. A variável decisiva — que os dados não capturam diretamente — é a <strong>qualidade individual dos jogadores na janela 26–29</strong>, onde potencial físico e maturidade técnica coexistem no pico. Identificar, contratar e reter esses perfis é a vantagem competitiva que diferencia quem apenas compete de quem vence.</p>
+        <div class="ei-synth-label" data-i18n="synth_label">SÍNTESE ESTRATÉGICA</div>
+        <blockquote class="ei-synth-quote" data-i18n="synth_quote">O perfil etário ideal não garante títulos — mas perfis errados garantem rebaixamento.</blockquote>
+        <p class="ei-synth-text" data-i18n="synth_text">A correlação funciona mais como <strong>filtro negativo</strong>: excesso de 30+ mata consistência, excesso de 21–25 sem âncora cria fragilidade tática. O equilíbrio próximo ao modelo <strong>10 / 30 / 30 / 30</strong> é condição necessária para competir no G5. A variável decisiva — que os dados não capturam diretamente — é a <strong>qualidade individual dos jogadores na janela 26–29</strong>, onde potencial físico e maturidade técnica coexistem no pico. Identificar, contratar e reter esses perfis é a vantagem competitiva que diferencia quem apenas compete de quem vence.</p>
       </div>
     </div>
 
     <!-- IMPLICATIONS -->
-    <div class="ei-section-title" style="margin-top:32px">IMPLICAÇÕES PARA A GESTÃO DO ELENCO</div>
+    <div class="ei-section-title" style="margin-top:32px" data-i18n="impl_title">IMPLICAÇÕES PARA A GESTÃO DO ELENCO</div>
     <div class="ei-implications">
       <div class="ei-impl-card">
         <div class="ei-impl-icon">🎯</div>
-        <div class="ei-impl-title">Prioridade de contratação</div>
-        <p>Concentrar recursos na faixa <strong>26–29</strong> de alta qualidade. Um jogador de elite nessa janela tem impacto comprovadamente maior do que múltiplas contratações em outras faixas.</p>
+        <div class="ei-impl-title" data-i18n="impl1_title">Prioridade de contratação</div>
+        <p data-i18n="impl1_text">Concentrar recursos na faixa <strong>26–29</strong> de alta qualidade. Um jogador de elite nessa janela tem impacto comprovadamente maior do que múltiplas contratações em outras faixas.</p>
       </div>
       <div class="ei-impl-card">
         <div class="ei-impl-icon">⚠️</div>
-        <div class="ei-impl-title">Sinal de alerta</div>
-        <p>Monitorar a proporção de <strong>30+ no plantel</strong>. Acima de 40%, o risco de inconsistência sobe drasticamente. Renovação progressiva é mais segura do que ciclos abruptos.</p>
+        <div class="ei-impl-title" data-i18n="impl2_title">Sinal de alerta</div>
+        <p data-i18n="impl2_text">Monitorar a proporção de <strong>30+ no plantel</strong>. Acima de 40%, o risco de inconsistência sobe drasticamente. Renovação progressiva é mais segura do que ciclos abruptos.</p>
       </div>
       <div class="ei-impl-card">
         <div class="ei-impl-icon">🌱</div>
-        <div class="ei-impl-title">Base e formação</div>
-        <p>Jogadores <strong>21–25 de qualidade</strong> são o investimento de médio prazo — mas precisam de titulares 26–29 ao lado para se desenvolver. Sem esse par, o elenco jovem oscila.</p>
+        <div class="ei-impl-title" data-i18n="impl3_title">Base e formação</div>
+        <p data-i18n="impl3_text">Jogadores <strong>21–25 de qualidade</strong> são o investimento de médio prazo — mas precisam de titulares 26–29 ao lado para se desenvolver. Sem esse par, o elenco jovem oscila.</p>
       </div>
       <div class="ei-impl-card">
         <div class="ei-impl-icon">📊</div>
-        <div class="ei-impl-title">Métrica de gestão</div>
-        <p>O <strong>Score de Equilíbrio</strong> (0–100) usado nesta análise pode ser incorporado como KPI trimestral de gestão de elenco, sinalizando desvios antes que impactem nos resultados.</p>
+        <div class="ei-impl-title" data-i18n="impl4_title">Métrica de gestão</div>
+        <p data-i18n="impl4_text">O <strong>Score de Equilíbrio</strong> (0–100) usado nesta análise pode ser incorporado como KPI trimestral de gestão de elenco, sinalizando desvios antes que impactem nos resultados.</p>
       </div>
     </div>
 
@@ -732,16 +740,11 @@ canvas{max-height:220px;}
     <!-- Team year-by-year comparison -->
     <div class="card" id="teamYearCard">
       <div class="card-title" style="justify-content:space-between;align-items:center;display:flex">
-        <span>📅 Comparativo por Equipe – Ano a Ano</span>
+        <span data-i18n="tyg_title">📅 Comparativo por Equipe – Ano a Ano</span>
         <div style="display:flex;gap:8px;align-items:center">
-          <label style="font-size:11px;color:var(--txt2);font-weight:600">Anos exibidos:</label>
+          <label style="font-size:11px;color:var(--txt2);font-weight:600" data-i18n="tyg_years_label">Anos exibidos:</label>
           <div class="chip-group" id="yearDisplayChips" style="gap:4px"></div>
-          <label style="font-size:11px;color:var(--txt2);font-weight:600;margin-left:8px">Grupo:</label>
-          <select id="teamCompGroup" style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg)">
-            <option value="G5">G5 – Top 5</option>
-            <option value="Z4">Z4 – Rebaixados</option>
-            <option value="AMBOS">G5 + Z4</option>
-          </select>
+          <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;background:linear-gradient(135deg,var(--g5l),var(--z4l));color:var(--txt);border:1.5px solid var(--border);margin-left:6px" title="Exibindo sempre G5 + Z4">G5 + Z4</span>
         </div>
       </div>
       <div id="teamYearGrid"></div>
@@ -849,7 +852,17 @@ const IDEAL_CENTER = {'Até 20':7,'21 a 25':30,'26 a 29':30,'30+':30};
 const FAIXAS = ['Até 20','21 a 25','26 a 29','30+'];
 const FC = {'Até 20':'#EF4444','21 a 25':'#F59E0B','26 a 29':'#22C55E','30+':'#8B5CF6'};
 const FB = {'Até 20':'#FEE2E2','21 a 25':'#FEF3C7','26 a 29':'#DCFCE7','30+':'#EDE9FE'};
-const YEARS_CALC = [2021,2022,2023,2024,2025];
+const YEARS_CALC = [2021,2022,2023,2024,2025,2026];
+
+// ─── BOTAFOGO 2026 HARDCODED PROFILE (≥300 min, 27 jogadores) ─────────────────
+// Fonte: Wyscout · temporada em andamento · filtro 300 min (vs 1000 padrão)
+const BOTO_2026 = {
+  ano:2026, nome:'Botafogo', g5z4:'Outros',
+  pos:0, pts:0, classif:'',
+  'Até 20':6, '21 a 25':7, '26 a 29':7, '30+':7,
+  total:27, sumAge:695,
+  _ongoing: true  // flags this as a season-in-progress record
+};
 const ALL_POS = ['Atacante','Goleiro','Lateral','Meio-Campo','Ponta','Vol/Meio-Campo Def','Zagueiro'];
 
 // ─── PLAYERS DATA ─────────────────────────────────────────────────────────────
@@ -881,16 +894,21 @@ function balanceScore(profile) {
   dev += Math.abs((profile['Até 20']||0) - 7);
   return Math.max(0, Math.round(100 - dev));
 }
+function t(key) { return (I18N[currentLang] || I18N.pt)[key] || key; }
+function tFaixa(f) {
+  const map = { 'Até 20': t('f_u20'), '21 a 25': t('f_21'), '26 a 29': t('f_26'), '30+': t('f_30') };
+  return map[f] || f;
+}
 function diagnose(profile) {
   const issues = [];
-  if ((profile['Até 20']||0) > 15) issues.push('⚠️ Excesso de jovens ≤20');
-  if ((profile['21 a 25']||0) > 40) issues.push('⚠️ Excesso de 21-25');
-  if ((profile['21 a 25']||0) < 18) issues.push('⚠️ Déficit de 21-25');
-  if ((profile['26 a 29']||0) < 20) issues.push('🔴 Déficit crítico 26-29');
-  if ((profile['26 a 29']||0) > 45) issues.push('⚠️ Excesso de 26-29');
-  if ((profile['30+']||0) > 55) issues.push('🔴 Excesso de veteranos');
-  if ((profile['30+']||0) < 18) issues.push('⚠️ Déficit de 30+');
-  return issues.length ? issues.join(' · ') : '✅ Perfil equilibrado';
+  if ((profile['Até 20']||0) > 15) issues.push(t('diag_exc_u20'));
+  if ((profile['21 a 25']||0) > 40) issues.push(t('diag_exc_21'));
+  if ((profile['21 a 25']||0) < 18) issues.push(t('diag_def_21'));
+  if ((profile['26 a 29']||0) < 20) issues.push(t('diag_def_26'));
+  if ((profile['26 a 29']||0) > 45) issues.push(t('diag_exc_26'));
+  if ((profile['30+']||0) > 55)    issues.push(t('diag_exc_30'));
+  if ((profile['30+']||0) < 18)    issues.push(t('diag_def_30'));
+  return issues.length ? issues.join(' · ') : t('diag_ok');
 }
 
 // ─── FILTER & AGGREGATE ──────────────────────────────────────────────────────
@@ -950,8 +968,8 @@ function renderBalance(g5P, z4P, g5count, z4count) {
       const arrow = ok?'✓':diff>0?'▲':'▼';
       ihtml += `<div class="ii-item" style="background:${bg}">
         <div class="ii-val" style="color:${col}">${v.toFixed(0)}%</div>
-        <div class="ii-lbl">${f}</div>
-        <div class="ii-tgt" style="color:${col}">Meta: ${lo}-${hi}%</div>
+        <div class="ii-lbl">${tFaixa(f)}</div>
+        <div class="ii-tgt" style="color:${col}">${t('bal_target')}: ${lo}-${hi}%</div>
         <div class="ii-diff" style="color:${ok?'#15803D':diff>0?'#B45309':'#B91C1C'}">${arrow} ${diffTxt}pp</div>
       </div>`;
     });
@@ -959,8 +977,8 @@ function renderBalance(g5P, z4P, g5count, z4count) {
 
     return `<div class="balance-card ${cls}">
       <div class="bc-header">
-        <span class="bc-badge ${badge==='g5'?'g5':'z4'}">${badge==='g5'?'G5 – TOP 5':'Z4 – REBAIXAMENTO'}</span>
-        <div><div class="bc-title">${title}</div><div class="bc-sub">n = ${count} time(s)/temporada</div></div>
+        <span class="bc-badge ${badge==='g5'?'g5':'z4'}">${badge==='g5'?t('bal_g5badge'):t('bal_z4badge')}</span>
+        <div><div class="bc-title">${title}</div><div class="bc-sub">n = ${count} ${t('bal_seasons')}</div></div>
       </div>
       ${ihtml}
       <div class="balance-score-wrap" style="background:${scoreBg}">
@@ -968,22 +986,22 @@ function renderBalance(g5P, z4P, g5count, z4count) {
           <span class="bs-val" style="color:${scoreColor}">${score}</span>
           <span class="bs-lbl" style="color:${scoreColor}">SCORE</span>
         </div>
-        <div class="bs-desc"><strong>Diagnóstico:</strong> ${diag}</div>
+        <div class="bs-desc"><strong>${t('bal_diagnosis')}:</strong> ${diag}</div>
       </div>
     </div>`;
   }
 
   wrap.innerHTML =
-    makeCard('g5-card','g5','Perfil Médio de Idade',g5P,g5count) +
-    makeCard('z4-card','z4','Perfil Médio de Idade',z4P,z4count);
+    makeCard('g5-card','g5',t('bal_card_title'),g5P,g5count) +
+    makeCard('z4-card','z4',t('bal_card_title'),z4P,z4count);
 }
 
 // ─── RENDER STACKED BARS ─────────────────────────────────────────────────────
 function renderStackedBars(g5P, z4P) {
   const rows = [
-    { label:'G5 – Top 5', profile:g5P, bg:'var(--g5xl)', border:'var(--g5m)' },
-    { label:'Z4 – Rebaixados', profile:z4P, bg:'var(--z4xl)', border:'var(--z4m)' },
-    { label:'Modelo Ideal', profile:{...IDEAL_CENTER}, bg:'#F0FDF4', border:'#22C55E' },
+    { label:t('lbl_g5'), profile:g5P, bg:'var(--g5xl)', border:'var(--g5m)' },
+    { label:t('lbl_z4'), profile:z4P, bg:'var(--z4xl)', border:'var(--z4m)' },
+    { label:t('lbl_ideal'), profile:{...IDEAL_CENTER}, bg:'#F0FDF4', border:'#22C55E' },
   ];
   let html = '';
   rows.forEach(row => {
@@ -995,13 +1013,13 @@ function renderStackedBars(g5P, z4P) {
     FAIXAS.forEach(f => {
       const v = ((p[f]||0)/tot*100).toFixed(1);
       html += `<div class="stack-seg" style="width:${v}%;background:${FC[f]};color:#fff;min-width:${v>5?'0':'0'}px"
-        title="${f}: ${(p[f]||0).toFixed(0)}%">
+        title="${tFaixa(f)}: ${(p[f]||0).toFixed(0)}%">
         ${+v>8?`${(p[f]||0).toFixed(0)}%`:''}
       </div>`;
     });
     html += `</div><div style="display:flex;gap:10px;margin-top:4px">`;
     FAIXAS.forEach(f => {
-      html += `<span style="font-size:10px;font-weight:700;color:${FC[f]}">${f}: <strong>${(p[f]||0).toFixed(0)}%</strong></span>`;
+      html += `<span style="font-size:10px;font-weight:700;color:${FC[f]}">${tFaixa(f)}: <strong>${(p[f]||0).toFixed(0)}%</strong></span>`;
     });
     html += '</div></div>';
   });
@@ -1015,13 +1033,13 @@ function renderBarChart(g5P, z4P) {
   charts.bar = new Chart(ctx, {
     type:'bar',
     data: {
-      labels: FAIXAS,
+      labels: FAIXAS.map(tFaixa),
       datasets: [
-        { label:'G5 – Top 5', data:FAIXAS.map(f=>+(g5P[f]||0).toFixed(1)),
+        { label:t('lbl_g5'), data:FAIXAS.map(f=>+(g5P[f]||0).toFixed(1)),
           backgroundColor:'#4472C4BB',borderColor:'#1F3864',borderWidth:2,borderRadius:5 },
-        { label:'Z4 – Rebaixados', data:FAIXAS.map(f=>+(z4P[f]||0).toFixed(1)),
+        { label:t('lbl_z4'), data:FAIXAS.map(f=>+(z4P[f]||0).toFixed(1)),
           backgroundColor:'#C00000BB',borderColor:'#7B0000',borderWidth:2,borderRadius:5 },
-        { label:'Modelo Ideal', data:[7,30,30,30], type:'line',
+        { label:t('lbl_ideal'), data:[7,30,30,30], type:'line',
           borderColor:'#22C55E',backgroundColor:'transparent',
           borderDash:[6,3],borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#22C55E',tension:0.2 },
       ]
@@ -1052,7 +1070,7 @@ function renderEvolChart(allTeams) {
     type:'line',
     data:{ labels:validYears,
       datasets: FAIXAS.map((f,i)=>({
-        label:f, borderColor:fCols[i], backgroundColor:fCols[i]+'22',
+        label:tFaixa(f), borderColor:fCols[i], backgroundColor:fCols[i]+'22',
         data:validYears.map(y=>+(g5byYear[y][f]||0).toFixed(1)),
         fill:false,tension:0.3,borderWidth:2.5,pointRadius:4
       }))
@@ -1092,7 +1110,7 @@ function renderTimeline(allTeams) {
     FAIXAS.forEach((f,i) => {
       const isRef = (y) => y <= 2020;
       datasets.push({
-        label: `${g} · ${f}`,
+        label: `${g} · ${tFaixa(f)}`,
         data: allYears.map(y => getVal(y,g,f)),
         borderColor: fCols[i],
         backgroundColor: 'transparent',
@@ -1128,8 +1146,8 @@ function renderRefTable(allTeams) {
     return `<span class="pct-pill ${cls}">${v.toFixed(0)}%</span>`;
   }
   const yearRows = [
-    {year:'2019 (ref)',tag:'ref-row',g5:REF_DATA[2019].G5,z4:REF_DATA[2019].Z4},
-    {year:'2020 (ref)',tag:'ref-row',g5:REF_DATA[2020].G5,z4:REF_DATA[2020].Z4},
+    {year:`2019 (${t('ref_ref')})`,tag:'ref-row',g5:REF_DATA[2019].G5,z4:REF_DATA[2019].Z4},
+    {year:`2020 (${t('ref_ref')})`,tag:'ref-row',g5:REF_DATA[2020].G5,z4:REF_DATA[2020].Z4},
   ];
   YEARS_CALC.forEach(y => {
     const g5sub = allTeams.filter(t=>t.ano===y&&t.g5z4==='G5');
@@ -1137,15 +1155,14 @@ function renderRefTable(allTeams) {
     const g5p = avgProfile(g5sub), z4p = avgProfile(z4sub);
     yearRows.push({year:String(y),tag:'',g5:g5p,z4:z4p});
   });
-  // GERAL row
   const g5all = allTeams.filter(t=>t.g5z4==='G5');
   const z4all = allTeams.filter(t=>t.g5z4==='Z4');
-  yearRows.push({year:'GERAL 2021-25',tag:'',g5:avgProfile(g5all),z4:avgProfile(z4all)});
-  yearRows.unshift({year:'GERAL 2019-21 (ref)',tag:'ref-row',g5:REF_DATA.GERAL_2019_2021.G5,z4:REF_DATA.GERAL_2019_2021.Z4});
+  yearRows.push({year:t('ref_overall2125'),tag:'',g5:avgProfile(g5all),z4:avgProfile(z4all)});
+  yearRows.unshift({year:t('ref_overall1921'),tag:'ref-row',g5:REF_DATA.GERAL_2019_2021.G5,z4:REF_DATA.GERAL_2019_2021.Z4});
 
   let html = `<table class="reft-table"><thead><tr>
-    <th>Período</th><th>Grupo</th>
-    <th>Até 20</th><th>21 a 25</th><th>26 a 29</th><th>Acima 30</th><th>Score Equilíbrio</th>
+    <th>${t('ref_period')}</th><th>${t('ref_group')}</th>
+    <th>${tFaixa('Até 20')}</th><th>${tFaixa('21 a 25')}</th><th>${tFaixa('26 a 29')}</th><th>${t('ref_over30')}</th><th>${t('ref_score')}</th>
   </tr></thead><tbody>`;
 
   yearRows.forEach(row => {
@@ -1181,7 +1198,7 @@ function renderScatters(allTeams) {
       { label:'Z4', data:pts.filter(t=>t.g5z4==='Z4').map(t=>({
           x:+((t['26 a 29']/t.total)*100).toFixed(1), y:t.pos, lbl:`${t.nome} ${t.ano}` })),
         backgroundColor:'#C00000AA', pointRadius:7 },
-      { label:'Outros', data:pts.filter(t=>t.g5z4==='Outros').map(t=>({
+      { label:t('lbl_others'), data:pts.filter(t=>t.g5z4==='Outros').map(t=>({
           x:+((t['26 a 29']/t.total)*100).toFixed(1), y:t.pos, lbl:`${t.nome} ${t.ano}` })),
         backgroundColor:'#9CA3AF88', pointRadius:4 },
     ]},
@@ -1189,9 +1206,9 @@ function renderScatters(allTeams) {
         legend:{position:'top',labels:{font:{size:10}}},
         tooltip:{callbacks:{label:c=>`${c.raw.lbl}: ${c.raw.x}% | ${c.raw.y}º`}} },
       scales:{
-        x:{title:{display:true,text:'% jogadores 26-29',font:{size:10}},
+        x:{title:{display:true,text:t('sc1_xaxis'),font:{size:10}},
           ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#EEF1F7'}},
-        y:{reverse:true,min:1,max:20,title:{display:true,text:'Posição',font:{size:10}},
+        y:{reverse:true,min:1,max:20,title:{display:true,text:t('sc_yaxis'),font:{size:10}},
           ticks:{font:{size:10}},grid:{color:'#EEF1F7'}} }
     }
   });
@@ -1216,9 +1233,9 @@ function renderScatters(allTeams) {
         legend:{position:'top',labels:{font:{size:10}}},
         tooltip:{callbacks:{label:c=>`${c.raw.lbl}: score=${c.raw.x} | ${c.raw.y}º`}} },
       scales:{
-        x:{min:0,max:100,title:{display:true,text:'Score de Equilíbrio',font:{size:10}},
+        x:{min:0,max:100,title:{display:true,text:t('sc2_xaxis'),font:{size:10}},
           ticks:{font:{size:10}},grid:{color:'#EEF1F7'}},
-        y:{reverse:true,min:1,max:20,title:{display:true,text:'Posição',font:{size:10}},
+        y:{reverse:true,min:1,max:20,title:{display:true,text:t('sc_yaxis'),font:{size:10}},
           ticks:{font:{size:10}},grid:{color:'#EEF1F7'}} }
     }
   });
@@ -1250,8 +1267,8 @@ function renderScatters(allTeams) {
       ]},
     options:{ responsive:true, plugins:{legend:{position:'top',labels:{font:{size:10}}}},
       scales:{
-        y:{title:{display:true,text:'Nº de times',font:{size:10}},ticks:{font:{size:10}},grid:{color:'#EEF1F7'}},
-        x:{title:{display:true,text:'Faixa de Score de Equilíbrio',font:{size:10}},ticks:{font:{size:10}},grid:{display:false}}
+        y:{title:{display:true,text:t('hist_yaxis'),font:{size:10}},ticks:{font:{size:10}},grid:{color:'#EEF1F7'}},
+        x:{title:{display:true,text:t('hist_xaxis'),font:{size:10}},ticks:{font:{size:10}},grid:{display:false}}
       }
     }
   });
@@ -1259,12 +1276,12 @@ function renderScatters(allTeams) {
 
 
 // ─── RENDER TEAM YEAR GRID ────────────────────────────────────────────────────
-const DISPLAY_YEARS = new Set([2023,2024,2025]);
+const DISPLAY_YEARS = new Set([2024,2025,2026]);
 let _lastTeams = null;
 
 function renderTeamYearGrid(allTeams) {
   _lastTeams = allTeams;
-  const group = document.getElementById('teamCompGroup').value;
+  const group = 'AMBOS'; // Always locked to G5 + Z4
   const dispYears = [...DISPLAY_YEARS].sort();
 
   // All G5/Z4 teams for the selected years
@@ -1274,9 +1291,13 @@ function renderTeamYearGrid(allTeams) {
   );
 
   // BOTAFOGO pinned reference: fetch ALL years from allTeams (no group filter)
-  const botoAllYears = allTeams.filter(t =>
-    dispYears.includes(t.ano) && t.pos > 0 && t.total > 0 && t.nome === 'Botafogo'
+  let botoAllYears = allTeams.filter(t =>
+    dispYears.includes(t.ano) && t.total > 0 && t.nome === 'Botafogo'
   );
+  // Inject 2026 hardcoded profile if 2026 is in displayed years
+  if (dispYears.includes(2026) && !botoAllYears.find(t=>t.ano===2026)) {
+    botoAllYears = [...botoAllYears, BOTO_2026];
+  }
   const botoInGroup = allG5Z4teams.filter(t => t.nome === 'Botafogo');
 
   const teamNames = [...new Set(allG5Z4teams.map(t => t.nome))].sort((a,b) => {
@@ -1290,7 +1311,7 @@ function renderTeamYearGrid(allTeams) {
   });
 
   if (!teamNames.length && !botoAllYears.length) {
-    document.getElementById('teamYearGrid').innerHTML = '<p style="font-size:12px;color:var(--txt2);padding:12px">Nenhum time encontrado com os filtros atuais.</p>';
+    document.getElementById('teamYearGrid').innerHTML = '<p style="font-size:12px;color:var(--txt2);padding:12px">'+t('tyg_nodata')+'</p>';
     return;
   }
 
@@ -1334,14 +1355,18 @@ function renderTeamYearGrid(allTeams) {
     dispYears.forEach(y => {
       const t = teamsPool.find(tt=>tt.nome===nome&&tt.ano===y);
       if (!t) {
-        row += `<td colspan="6" style="color:#CCC;font-size:10px;font-style:italic;text-align:center;background:#FAFAFA">não participou</td>`;
+        row += `<td colspan="6" style="color:#CCC;font-size:10px;font-style:italic;text-align:center;background:#FAFAFA">${t('tyg_nopart')}</td>`;
         return;
       }
       const posCls = t.g5z4==='G5'?'pos-g5':'pos-z4';
       const sc = balanceScore({'Até 20':pct(t,'Até 20')||0,'21 a 25':pct(t,'21 a 25')||0,'26 a 29':pct(t,'26 a 29')||0,'30+':pct(t,'30+')||0});
       const scColor = sc>=75?'#22C55E':sc>=55?'#F59E0B':'#EF4444';
       const cellBg = isRef ? 'background:#FFFBEA;' : '';
-      row += `<td style="${cellBg}"><span class="pos-badge ${posCls}">${t.pos}º</span><br><span style="font-size:9px;font-weight:700;color:${scColor}">sc:${sc}</span></td>`;
+      const posDisplay = t._ongoing
+        ? `<span style="padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800;background:#FEF3C7;color:#92400E;border:1px solid #F59E0B">${currentLang==='en'?'Live':'Em curso'}</span>`
+        : `<span class="pos-badge ${posCls}">${t.pos}º</span>`;
+      const totalNote = t._ongoing ? `<br><span style="font-size:8px;color:#92400E;font-weight:600">${t.total}jog/300min</span>` : '';
+      row += `<td style="${cellBg}">${posDisplay}<br><span style="font-size:9px;font-weight:700;color:${scColor}">sc:${sc}</span>${totalNote}</td>`;
       FAIXAS.forEach(f => {
         const v = pct(t,f);
         if (v===null) { row += `<td style="${cellBg}color:#CCC">—</td>`; return; }
@@ -1360,7 +1385,7 @@ function renderTeamYearGrid(allTeams) {
   });
   html += '</tr><tr>';
   dispYears.forEach(() => {
-    ['Pos.','≤20','21–25','26–29','30+','Barra'].forEach(h => {
+    [t('tyg_pos'),t('tyg_u20'),t('tyg_21'),t('tyg_26'),t('tyg_30'),t('tyg_bar')].forEach(h => {
       html += `<th class="faixa-hdr" style="background:#2E2E2E;color:#fff">${h}</th>`;
     });
   });
@@ -1368,9 +1393,11 @@ function renderTeamYearGrid(allTeams) {
 
   // ── BOTAFOGO PINNED ROW (always first, amber header) ──────────────────────
   if (botoAllYears.length) {
+    const hasOngoing = botoAllYears.some(t=>t._ongoing);
+    const ongoingNote = hasOngoing ? ` &nbsp;·&nbsp; <span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px">${currentLang==='en'?'2026: LIVE – 300 min filter':'2026: EM CURSO – filtro 300 min'}</span>` : '';
     html += `<tr><td colspan="${1+dispYears.length*6}"
       style="background:linear-gradient(90deg,#FEF3C7,#FFF8DC);color:#92400E;font-weight:800;font-size:11px;padding:5px 12px;border-bottom:2px solid #F59E0B;border-top:2px solid #F59E0B">
-      📌 Botafogo – Referência Fixa (exibido independente dos filtros)
+      📌 Botafogo – ${currentLang==='en'?'Fixed Reference (shown regardless of filters)':'Referência Fixa (exibido independente dos filtros)'}${ongoingNote}
     </td></tr>`;
     html += buildRow('Botafogo', botoAllYears, true);
     html += `<tr><td colspan="${1+dispYears.length*6}" style="height:3px;background:linear-gradient(90deg,#F59E0B,transparent)"></td></tr>`;
@@ -1406,7 +1433,7 @@ function initYearDisplayChips() {
   const wrap = document.getElementById('yearDisplayChips');
   YEARS_CALC.forEach(y => {
     const d = document.createElement('div');
-    d.className = 'ychip' + ([2023,2024,2025].includes(y) ? ' active' : '');
+    d.className = 'ychip' + ([2024,2025,2026].includes(y) ? ' active' : '');
     d.textContent = y;
     d.addEventListener('click', () => {
       if (DISPLAY_YEARS.has(y)) {
@@ -1417,9 +1444,6 @@ function initYearDisplayChips() {
       if (_lastTeams) renderTeamYearGrid(_lastTeams);
     });
     wrap.appendChild(d);
-  });
-  document.getElementById('teamCompGroup').addEventListener('change', () => {
-    if (_lastTeams) renderTeamYearGrid(_lastTeams);
   });
 }
 
@@ -1638,6 +1662,183 @@ window.resetFilters = function() {
   [...ts.options].forEach(o=>o.selected=true);
   update();
 };
+
+// ─── I18N ─────────────────────────────────────────────────────────────────────
+let currentLang = 'pt';
+const I18N = {
+  pt: {
+    header_title: 'Perfil de Idade × Desempenho – Campeonato Brasileiro',
+    header_sub: 'BFR Analytics · Fonte: Wyscout · Cobertura: 2019–2025 · G5 &amp; Z4',
+    badge_g5: 'G5 · Top 5', badge_z4: 'Z4 · Rebaixados',
+    sb_filters:'🔍 Filtros', sb_minmin:'Minutagem mínima', sb_year:'📅 Ano',
+    sb_group:'🏆 Grupo', sb_pos:'⚽ Posição em Campo', sb_team:'🏟️ Equipe',
+    sb_ctrl:'Ctrl+clique para múltiplas', sb_standing:'📊 Posição no Campeonato',
+    sb_posmin:'Posição mín.', sb_posmax:'Posição máx.', sb_reset:'↺ Resetar Filtros',
+    chip_g5:'G5 – Top5', chip_z4:'Z4 – Rebaixados', chip_outros:'Demais',
+    kpi_players:'Jogadores', kpi_teams:'Times/Temp.', kpi_age:'Média Idade',
+    kpi_years:'anos', kpi_balance:'Equilíbrio', kpi_balance2:'Equilíbrio',
+    tab_insights:'🏆 Análise Executiva', tab_balance:'⚖️ Equilíbrio G5 vs Z4',
+    tab_timeline:'📅 Série Histórica', tab_scatter:'🎯 Correlação', tab_table:'📋 Tabela Detalhada',
+    ei_eyebrow:'ANÁLISE ESTRATÉGICA · GESTÃO DE ELENCO',
+    ei_title:'Perfil Etário <em>vs</em> Performance',
+    ei_subtitle:'Campeonato Brasileiro 2021–2025 · G5 &amp; Z4 · Base: Wyscout (+1.000 min)',
+    ei_meta1:'jogadores analisados', ei_meta2:'temporadas × clube',
+    ei_meta3:'anos de cobertura', ei_meta4:'faixas etárias',
+    ei_model_label:'MODELO IDEAL DE COMPOSIÇÃO ETÁRIA',
+    band1_lbl:'Até 20 anos', band1_desc:'Promessas / base',
+    band2_lbl:'21 a 25 anos', band2_desc:'Desenvolvimento',
+    band3_lbl:'26 a 29 anos', band3_desc:'Pico — faixa crítica',
+    band4_lbl:'Acima de 30', band4_desc:'Experiência',
+    ei_model_source:'Referência: análise 2019–2021 (dados Wyscout) · validada na série 2021–2025',
+    ei_conclusions_title:'CONCLUSÕES DA ANÁLISE',
+    c1_tag:'HIPÓTESE CONFIRMADA',
+    c1_title:'O equilíbrio etário é condição necessária — mas não suficiente',
+    c1_text:'O perfil médio real dos times G5 ao longo de 2021–2025 foi <strong>7% / 29% / 33% / 32%</strong> — notavelmente próximo do modelo ideal. A hipótese se confirma como <em>filtro negativo</em>: desequilíbrios severos predizem o fracasso com muito mais consistência do que o equilíbrio prediz o sucesso.',
+    c2_tag:'PRINCIPAL ACHADO',
+    c2_title:'A faixa 26–29 é a âncora do desempenho — com comportamento assimétrico',
+    c2_text:'Times com a faixa 26–29 como <strong>dominante</strong> apresentaram posição média de <strong>8,7</strong> e razão G5/Z4 de 4:1. Mais revelador: concentrações extremas nessa faixa (Flamengo 2024: 69%; Fortaleza 2021: 53%; Palmeiras 2022: 50%) não penalizaram — todos foram G5. A faixa 26–29 parece ter um <em>teto assimétrico</em>: excesso não mata porque são jogadores no pico físico e técnico.',
+    c3_tag:'FATOR DE RISCO #1',
+    c3_title:'Excesso de veteranos (30+) é o preditor mais forte de rebaixamento',
+    c3_text:'Times com dominância na faixa 30+ têm posição média de <strong>12,1</strong> (pior de todas as faixas), com razão G5/Z4 de apenas 1:2. Times com mais de 40% de veteranos caem de 20 G5 para apenas 5 G5. O excesso de 30+ aparece como <strong>causa principal de rebaixamento em 45% dos Z4</strong> analisados — o maior índice entre todos os tipos de desequilíbrio.',
+    c4_tag:'PARADOXO DOS DADOS',
+    c4_title:'A "falácia do equilíbrio": times perfeitamente balanceados também são rebaixados',
+    c4_text:'O achado mais contra-intuitivo: <strong>Grêmio 2021 (score 88, 17º), Sport Recife 2021 (score 87, 19º), Bahia 2021 (83, 18º)</strong> — três dos times mais bem balanceados da série foram rebaixados no mesmo ano. Isso demonstra que o perfil etário é proxy de <em>gestão de elenco saudável</em>, mas não captura qualidade individual, orçamento ou nível técnico dos jogadores em cada faixa. Um plantel com 30% de jogadores medíocres de 26–29 anos não bate um elenco estelar concentrado.',
+    c5_tag:'TENDÊNCIA ESTRUTURAL',
+    c5_title:'O Brasileirão está envelhecendo — contradição com ligas europeias',
+    c5_text:'A idade média dos titulares com +1.000 min subiu de <strong>26,2 anos em 2021</strong> para <strong>27,6 em 2025</strong>. O percentual de veteranos (30+) cresceu de 26% para 32%. Isso contradiz a tendência global de rejuvenescimento e reflete dois fenômenos estruturais: (1) exportação precoce de talentos antes dos 21 anos, e (2) retorno de jogadores experientes do exterior em fase de encerramento de carreira.',
+    c6_tag:'📌 CASO BOTAFOGO',
+    c6_title:'A jornada do Botafogo confirma o modelo — com uma nuance decisiva',
+    c6_text:'A evolução do Botafogo é o caso mais limpo da série. O equilíbrio etário criou a base; a <strong>qualidade dos jogadores 26–29 fez a diferença no título</strong>.',
+    synth_label:'SÍNTESE ESTRATÉGICA',
+    synth_quote:'O perfil etário ideal não garante títulos — mas perfis errados garantem rebaixamento.',
+    synth_text:'A correlação funciona mais como <strong>filtro negativo</strong>: excesso de 30+ mata consistência, excesso de 21–25 sem âncora cria fragilidade tática. O equilíbrio próximo ao modelo <strong>10 / 30 / 30 / 30</strong> é condição necessária para competir no G5. A variável decisiva — que os dados não capturam diretamente — é a <strong>qualidade individual dos jogadores na janela 26–29</strong>, onde potencial físico e maturidade técnica coexistem no pico. Identificar, contratar e reter esses perfis é a vantagem competitiva que diferencia quem apenas compete de quem vence.',
+    impl_title:'IMPLICAÇÕES PARA A GESTÃO DO ELENCO',
+    impl1_title:'Prioridade de contratação',
+    impl1_text:'Concentrar recursos na faixa <strong>26–29</strong> de alta qualidade. Um jogador de elite nessa janela tem impacto comprovadamente maior do que múltiplas contratações em outras faixas.',
+    impl2_title:'Sinal de alerta',
+    impl2_text:'Monitorar a proporção de <strong>30+ no plantel</strong>. Acima de 40%, o risco de inconsistência sobe drasticamente. Renovação progressiva é mais segura do que ciclos abruptos.',
+    impl3_title:'Base e formação',
+    impl3_text:'Jogadores <strong>21–25 de qualidade</strong> são o investimento de médio prazo — mas precisam de titulares 26–29 ao lado para se desenvolver. Sem esse par, o elenco jovem oscila.',
+    impl4_title:'Métrica de gestão',
+    impl4_text:'O <strong>Score de Equilíbrio</strong> (0–100) usado nesta análise pode ser incorporado como KPI trimestral de gestão de elenco, sinalizando desvios antes que impactem nos resultados.',
+    tyg_title:'📅 Comparativo por Equipe – Ano a Ano',
+    tyg_years_label:'Anos exibidos:',
+    // render keys
+    f_u20:'Até 20', f_21:'21 a 25', f_26:'26 a 29', f_30:'30+',
+    diag_exc_u20:'⚠️ Excesso de jovens ≤20', diag_exc_21:'⚠️ Excesso de 21-25',
+    diag_def_21:'⚠️ Déficit de 21-25', diag_def_26:'🔴 Déficit crítico 26-29',
+    diag_exc_26:'⚠️ Excesso de 26-29', diag_exc_30:'🔴 Excesso de veteranos',
+    diag_def_30:'⚠️ Déficit de 30+', diag_ok:'✅ Perfil equilibrado',
+    bal_target:'Meta', bal_g5badge:'G5 – TOP 5', bal_z4badge:'Z4 – REBAIXAMENTO',
+    bal_seasons:'time(s)/temporada', bal_diagnosis:'Diagnóstico', bal_card_title:'Perfil Médio de Idade',
+    lbl_g5:'G5 – Top 5', lbl_z4:'Z4 – Rebaixados', lbl_ideal:'Modelo Ideal', lbl_others:'Outros',
+    sc1_xaxis:'% jogadores 26-29', sc2_xaxis:'Score de Equilíbrio',
+    sc_yaxis:'Posição', hist_yaxis:'Nº de times', hist_xaxis:'Faixa de Score de Equilíbrio',
+    ref_period:'Período', ref_group:'Grupo', ref_ref:'ref', ref_over30:'Acima 30',
+    ref_score:'Score Equilíbrio', ref_overall2125:'GERAL 2021-25', ref_overall1921:'GERAL 2019-21 (ref)',
+    tyg_nodata:'Nenhum time encontrado com os filtros atuais.',
+    tyg_nopart:'não participou', tyg_pos:'Pos.', tyg_u20:'≤20',
+    tyg_21:'21–25', tyg_26:'26–29', tyg_30:'30+', tyg_bar:'Barra',
+  },
+  en: {
+    header_title: 'Age Profile × Performance – Brazilian Championship',
+    header_sub: 'BFR Analytics · Source: Wyscout · Coverage: 2019–2025 · G5 &amp; Z4',
+    badge_g5: 'G5 · Top 5', badge_z4: 'Z4 · Relegated',
+    sb_filters:'🔍 Filters', sb_minmin:'Minimum minutes', sb_year:'📅 Year',
+    sb_group:'🏆 Group', sb_pos:'⚽ Field Position', sb_team:'🏟️ Team',
+    sb_ctrl:'Ctrl+click for multiple', sb_standing:'📊 League Standing',
+    sb_posmin:'Min. position', sb_posmax:'Max. position', sb_reset:'↺ Reset Filters',
+    chip_g5:'G5 – Top 5', chip_z4:'Z4 – Relegated', chip_outros:'Others',
+    kpi_players:'Players', kpi_teams:'Teams/Season', kpi_age:'Avg Age',
+    kpi_years:'years', kpi_balance:'Balance', kpi_balance2:'Balance',
+    tab_insights:'🏆 Executive Analysis', tab_balance:'⚖️ G5 vs Z4 Balance',
+    tab_timeline:'📅 Historical Series', tab_scatter:'🎯 Correlation', tab_table:'📋 Detailed Table',
+    ei_eyebrow:'STRATEGIC ANALYSIS · SQUAD MANAGEMENT',
+    ei_title:'Age Profile <em>vs</em> Performance',
+    ei_subtitle:'Brazilian Championship 2021–2025 · G5 &amp; Z4 · Source: Wyscout (+1,000 min)',
+    ei_meta1:'players analysed', ei_meta2:'seasons × club',
+    ei_meta3:'years of coverage', ei_meta4:'age brackets',
+    ei_model_label:'IDEAL AGE COMPOSITION MODEL',
+    band1_lbl:'Up to 20 years', band1_desc:'Prospects / Academy',
+    band2_lbl:'21 to 25 years', band2_desc:'Development',
+    band3_lbl:'26 to 29 years', band3_desc:'Peak — critical window',
+    band4_lbl:'Over 30', band4_desc:'Experience',
+    ei_model_source:'Reference: 2019–2021 analysis (Wyscout data) · validated across 2021–2025 series',
+    ei_conclusions_title:'ANALYSIS CONCLUSIONS',
+    c1_tag:'HYPOTHESIS CONFIRMED',
+    c1_title:'Age balance is a necessary condition — but not sufficient',
+    c1_text:'The real average profile of G5 teams across 2021–2025 was <strong>7% / 29% / 33% / 32%</strong> — remarkably close to the ideal model. The hypothesis holds as a <em>negative filter</em>: severe imbalances predict failure far more consistently than balance predicts success.',
+    c2_tag:'KEY FINDING',
+    c2_title:'The 26–29 bracket is the performance anchor — with asymmetric behaviour',
+    c2_text:'Teams with 26–29 as the <strong>dominant</strong> bracket averaged a final position of <strong>8.7</strong> and a G5/Z4 ratio of 4:1. More revealing: extreme concentrations in this bracket (Flamengo 2024: 69%; Fortaleza 2021: 53%; Palmeiras 2022: 50%) carried no penalty — all finished G5. The 26–29 bracket appears to have an <em>asymmetric ceiling</em>: excess does not hurt because these players are at their physical and technical peak.',
+    c3_tag:'RISK FACTOR #1',
+    c3_title:'Excess veterans (30+) is the strongest predictor of relegation',
+    c3_text:'Teams dominated by the 30+ bracket averaged a final position of <strong>12.1</strong> (worst of all brackets), with a G5/Z4 ratio of just 1:2. Teams with over 40% veterans drop from 20 G5 cases to only 5. Excess 30+ appears as the <strong>primary cause of relegation in 45% of Z4 teams</strong> analysed — the highest share among all imbalance types.',
+    c4_tag:'DATA PARADOX',
+    c4_title:'The "balance fallacy": perfectly balanced squads can still be relegated',
+    c4_text:'The most counter-intuitive finding: <strong>Grêmio 2021 (score 88, 17th), Sport Recife 2021 (score 87, 19th), Bahia 2021 (83, 18th)</strong> — three of the best-balanced squads in the series were relegated in the same year. This shows that the age profile is a proxy for <em>healthy squad management</em>, but does not capture individual quality, budget, or technical level within each bracket. A squad with 30% mediocre 26–29 players will not beat a star-studded concentrated roster.',
+    c5_tag:'STRUCTURAL TREND',
+    c5_title:'The Brasileirão is ageing — a contradiction with European leagues',
+    c5_text:'The average age of starters with +1,000 min rose from <strong>26.2 years in 2021</strong> to <strong>27.6 in 2025</strong>. The share of veterans (30+) grew from 26% to 32%. This contradicts the global rejuvenation trend and reflects two structural phenomena: (1) early export of talent before age 21, and (2) return of experienced players from abroad late in their careers.',
+    c6_tag:'📌 BOTAFOGO CASE',
+    c6_title:"Botafogo's journey confirms the model — with one decisive nuance",
+    c6_text:"Botafogo's evolution is the cleanest case in the series. Age balance built the foundation; the <strong>quality of the 26–29 players made the difference in the title run</strong>.",
+    synth_label:'STRATEGIC SYNTHESIS',
+    synth_quote:'The ideal age profile does not guarantee titles — but the wrong profile guarantees relegation.',
+    synth_text:'The correlation operates more as a <strong>negative filter</strong>: excess 30+ kills consistency, excess 21–25 without an anchor creates tactical fragility. A balance close to the <strong>10 / 30 / 30 / 30</strong> model is a necessary condition to compete in the G5. The decisive variable — which the data do not capture directly — is the <strong>individual quality of players in the 26–29 window</strong>, where physical potential and technical maturity peak simultaneously. Identifying, signing and retaining those profiles is the competitive edge that separates those who merely compete from those who win.',
+    impl_title:'IMPLICATIONS FOR SQUAD MANAGEMENT',
+    impl1_title:'Signing priority',
+    impl1_text:'Focus resources on top-quality <strong>26–29</strong> players. An elite player in that window has a proven impact larger than multiple signings in other brackets.',
+    impl2_title:'Warning signal',
+    impl2_text:'Monitor the proportion of <strong>30+ in the squad</strong>. Above 40%, the inconsistency risk rises sharply. Progressive renewal is safer than abrupt overhauls.',
+    impl3_title:'Academy and development',
+    impl3_text:'High-quality <strong>21–25 players</strong> are the medium-term investment — but they need 26–29 starters alongside them to develop. Without that pairing, young squads oscillate.',
+    impl4_title:'Management KPI',
+    impl4_text:'The <strong>Balance Score</strong> (0–100) used in this analysis can be integrated as a quarterly squad-management KPI, flagging deviations before they impact results.',
+    tyg_title:'📅 Team Comparison – Year by Year',
+    tyg_years_label:'Years displayed:',
+    // render keys
+    f_u20:'Up to 20', f_21:'21 to 25', f_26:'26 to 29', f_30:'30+',
+    diag_exc_u20:'⚠️ Excess youth ≤20', diag_exc_21:'⚠️ Excess 21-25',
+    diag_def_21:'⚠️ Deficit 21-25', diag_def_26:'🔴 Critical deficit 26-29',
+    diag_exc_26:'⚠️ Excess 26-29', diag_exc_30:'🔴 Excess veterans',
+    diag_def_30:'⚠️ Deficit 30+', diag_ok:'✅ Balanced profile',
+    bal_target:'Target', bal_g5badge:'G5 – TOP 5', bal_z4badge:'Z4 – RELEGATED',
+    bal_seasons:'team(s)/season', bal_diagnosis:'Diagnosis', bal_card_title:'Average Age Profile',
+    lbl_g5:'G5 – Top 5', lbl_z4:'Z4 – Relegated', lbl_ideal:'Ideal Model', lbl_others:'Others',
+    sc1_xaxis:'% players 26-29', sc2_xaxis:'Balance Score',
+    sc_yaxis:'Position', hist_yaxis:'No. of teams', hist_xaxis:'Balance Score Range',
+    ref_period:'Period', ref_group:'Group', ref_ref:'ref', ref_over30:'Over 30',
+    ref_score:'Balance Score', ref_overall2125:'OVERALL 2021-25', ref_overall1921:'OVERALL 2019-21 (ref)',
+    tyg_nodata:'No teams found with the current filters.',
+    tyg_nopart:'did not participate', tyg_pos:'Pos.', tyg_u20:'≤20',
+    tyg_21:'21–25', tyg_26:'26–29', tyg_30:'30+', tyg_bar:'Bar',
+  }
+};
+
+function applyLang(lang) {
+  const dict = I18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  // Toggle button label
+  const btn = document.getElementById('langToggle');
+  if (lang === 'pt') {
+    btn.innerHTML = '🌐 <span class="lt-active">PT</span> / EN';
+  } else {
+    btn.innerHTML = '🌐 PT / <span class="lt-active">EN</span>';
+  }
+  document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'pt' ? 'en' : 'pt';
+  applyLang(currentLang);
+  update(); // re-render all dynamic content with new language
+}
+
+window.toggleLang = toggleLang;
 
 init();
 </script>
